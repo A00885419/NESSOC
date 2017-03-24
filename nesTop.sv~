@@ -1,0 +1,13 @@
+/*
+	Top Level NES module.
+	
+	By Peter Li and Cameron Morgan,
+
+*/
+
+//`define DEBUGGING 1 //  Enable debugging mode for use with test benches
+
+module NESOC();
+	logic AB,
+	logic 
+endmodule

@@ -1,0 +1,72 @@
+/*
+	PPU.sv
+*/
+
+`include "nessoc.svh"
+
+`define PPU_DB
+
+module ppu( // Top level PPU Component
+	input logic [2:0] CPUA,	// PPU register select Selects ppu register 0-7 (mapped to $2000-$2007 by PPUMMC)
+	input logic [7:0] CPUDI,  // CPU data input
+	output logic[7:0] CPUDO,  // CPU data read 
+	input logic RW, 	// Read/Write
+	input logic CS, 	// Chip Select
+	input logic RST,	// Chip reset
+	input logic clk,	// Input clock 21.47727 MHz
+	output logic NMI,	// Non interruptable Interrupted (signifies the start of VBLANK)
+	output logic ALE, 	// Address latch enable
+	input logic [3:0] EXTI, //  EXT input (Probably gonna be unused)
+	output logic [13:0] APPU, // Address and data pins 
+	output logic [7:0] PPUDO, // PPU data output
+	input logic [7:0] PPUDI, // PPU data
+	output logic [3:0] EXTO // EXT output (Probably gonna be unused)
+);
+
+// PPU Sprite ram 
+/*
+	This ram is dual access, it is Written to by the DMA and accessed by the 	PPU	
+
+
+	This is a separate area of ram (256 bytes in size) Specifically holds
+	sprite data
+	Byte data is stored as follows:
+	Byte 0 - Stores y-co-ordinate of the top left of the sprite minus 1
+	Byte 1 - Index Number of the sprite in the pattern tables
+	Byte 2 - Stores attributes of sprites
+	 	Bits 0&1 - MSB of colour
+		Bit 5 - indicates whether or not sprite has priority over BG
+		Bit 6 - inidcates whether to flip sprite horizontal
+		Bit 7 - indicates whether to flip sprite vertically
+		
+*/
+	logic [7:0] SPR_RAM[255:0];
+
+
+endmodule
+
+module ppu_name_tables(); 
+endmodule 
+
+module pattern_tables();
+endmodule
+
+module palletes(); // PPU pallets table  
+endmodule
+
+
+/*
+	The DMA is where it gets a little bit weird
+	The DMA reads from the CPU memory space and 
+	writes to the SPR ram (Note the SPR_RAM exists in it's own address space) 
+*/
+module ppa_dma(
+	input logic [15:0]source, // Exists in CPU address space
+	input logic [7:0]dest,    // Exists in SPR address space
+	output logic status,	  // DMA will steal CPU cycles and will prevent CPU
+							  // from reading new instructions until DMA process
+							  // is complete
+						
+);
+endmodule
+
