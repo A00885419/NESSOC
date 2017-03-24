@@ -1,5 +1,8 @@
 // VGA driver, takes a 256x240 image and scales it to 640x480@60Hz VGA
 // by using a 12.5MHz pixel clock, and incorporating black borders on either side
+// Frame buffer module instantiate within VGA_out
+module frame_buff();
+endmodule
 
 module vga_out(
 input logic pix_clk,	// 12.5 MHz clock signal
