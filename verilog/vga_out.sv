@@ -2,14 +2,10 @@
 // by using a 12.5MHz pixel clock, and incorporating black borders on either side
 
 
-// Frame buffer module instantiate within VGA_out
-// Frame buffer is a 256x240 sized buffer that stores the current frame
-module frame_buff();
-endmodule
-
 module vga_out(
+input logic [7:0] DI, // Frame buffer Read data 
 input logic pix_clk,	// 12.5 MHz clock signal
-output logic [8:0] rgb,	// 3 bits each for red, green, blue
+output logic [8:0] rgb,	// 3 bits each for red, green, blue // Does this output to Headers? --Peter
 output logic vsync,		// vertical syncing signal, active low
 output logic hsync) ;	// horizonal syncing signal, active low
 
@@ -35,7 +31,7 @@ always @(posedge pix_clk) begin
 	if (pixel_x < 32)
 		rgb <= '0;
 	else if (pixel_x < 288)
-		// RGB gets NES info 
+		// RGB gets NES info // Get the information from the framebuffer module 
 		//
 		//
 		//
