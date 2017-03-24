@@ -1,7 +1,37 @@
-// Vga_fb.sv
+// Vga_fb.sv - Tested Working , testbench and results can be found in /testbench
 
 // This is the frame buffer for vga, The frame buffer in this case is basically ram within the ppu 
 // It will be instantiated alongside not within the vga
+
+/*
+	Frame buffer relationships:
+	
+	
+
+ +--------------+   c_codes   +----------+
+ |              |   (eg. 18   |          |
+ |              | +---------> |  vga     |
+ |    ppu       |   gives a   |  Frame   |
+ |              |   brownish  |  Buffer  |
+ |              |   colour)   |          |
+ |              |             +----------+
+ +--------------+                  |rgb values
+                                   |RRRGGGBBB
+                                   v(eg. 000111000
+         +--------------+           gives pure green)
+         |              |     +----------+
+         |   Video      |     |          |
+         |              |     |  vga     |
+         |              |     |  timing..|
+         |              | <---+  logic.. |
+         |              |     |  etc..   |
+         |              |     +----------+
+         +--------------+	
+	
+	
+	frame buffer is a 2dimensional array read from it with 
+	pix_ptr_x and pix_ptr_y
+*/
 
 module vga_fb(
 	// Input control lines from ppu
