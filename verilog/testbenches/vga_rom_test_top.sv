@@ -1,7 +1,7 @@
 // VGA ROM top level test.
 
 //
-// (PPU REPLACED BY TEST_IMG_DUMMY_ROM) -> 
+// (PPU REPLACED BY TEST_IMG_DUMMY_ROM) 
 module vga_rom_test_top();
 	logic pix_clk;
 	logic ppu_clk;
@@ -19,21 +19,28 @@ module vga_rom_test_top();
 	logic hsync;	
 	logic [8:0]rgb_OUT;
 	// Test variables 
-	integer i;
+	integer i, j, k;
 	integer progState;
 	
 	always_ff@(posedge ppu_clk) begin //
-		if(rst) begin 
-			progState = 0;
+		if(progState = 0) begin // state 0 = reset
 			i = 0;
-		end else
+			progState = 1;
+		end else begin 
+			if(i < (240*256 + 1)) begin 
+				ppu_ptr_x = ppu_ptr_x+1;
+				if(ppu_ptr_x == 255) 
+					ppu_ptr_y = ppu_ptr_y +1;	
+				i = i + 1;
+			end
+		end 
 	end 
 
 	// VGA output initialization 
 	vga_out vgao_dut(
 		.pix_clk(pix_clk), .rgb_buf(rgb), 
 		.pix_ptr_x(fb_ptr_x),.pix_ptr_y(fb_ptr_y),
-		.rgb(rgb_OUT),.
+		.rgb(rgb_OUT),. .vsync(vsync), .hsync(hsync)
 		);
 	
 	// frame buffer initialization
@@ -44,9 +51,15 @@ module vga_rom_test_top();
 		.pix_ptr_x(fb_ptr_x), .pix_ptr_y(fb_ptr_y),
 		.rgb(rgb)		
 		);
+		
 	initial begin
-		for 
+		progState = 0;
+		for (j = 0; i <256; j++) begin 
+			$readmemh("pixtest.c_code", TEST_IMG_DUMMY_ROM);
+		end 		
 	end 
+	
+	
 	
 endmodule
 
