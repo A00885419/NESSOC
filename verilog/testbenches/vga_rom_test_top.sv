@@ -13,6 +13,10 @@ module vga_rom_test_top();
 	logic [7:0]ppu_ptr_x;
 	logic [7:0]ppu_ptr_y;
 	logic [8:0]rgb;
+	
+	// PIN outputs
+	logic vsync;
+	logic hsync;
 	logic [8:0]rgb_OUT;
 	// Test variables 
 	integer i;
@@ -29,7 +33,7 @@ module vga_rom_test_top();
 	vga_out vgao_dut(
 		.pix_clk(pix_clk), .rgb_buf(rgb), 
 		.pix_ptr_x(fb_ptr_x),.pix_ptr_y(fb_ptr_y),
-		
+		.rgb(rgb_OUT),.
 		);
 	
 	// frame buffer initialization
