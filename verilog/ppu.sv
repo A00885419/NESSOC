@@ -1,34 +1,33 @@
 /*
 	PPU.sv
-	
-	
 */
 
 `include "nessoc.svh"
-
-`define PPU_DB
 
 module ppu_top();
 
 endmodule
 
-module ppu_core( // PPU Component
-	input logic [2:0] CPUA,	// PPU register select Selects ppu register 0-7 (mapped to $2000-$2007 by PPUMMC)
-	input logic [7:0] CPUDI,  // CPU data input
-	output logic[7:0] CPUDO,  // CPU data read 
-	input logic CPUCLK,	// Cpu clock for read/write 
-	input logic RW, 	// Read/Write
-	input logic CS, 	// Chip Select
-	input logic RST,	// Chip reset
-	input logic PPUCLK,	// Input clock 21.47727 MHz for ppu functions
-	output logic NMI,	// Non interruptable Interrupted (signifies the start of VBLANK)
-	output logic ALE, 	// Address latch enable
-	input logic [3:0] EXTI, //  EXT input (Probably gonna be unused)
-	output logic [13:0] APPU, // Address and data pins 
-	output logic [7:0] PPUDO, // PPU data output
-	input logic [7:0] PPUDI, // PPU data
-	output logic [3:0] EXTO // EXT output (Probably gonna be unused)
+module ppu_core( 				// PPU Component
+	input logic [2:0] CPUA,		// PPU register select Selects ppu register 0-7 (mapped to $2000-$2007 by PPUMMC)
+	input logic [7:0] CPUDI,  	// CPU data input
+	output logic[7:0] CPUDO,  	// CPU data read 
+	input logic CPUCLK,			// Cpu clock for read/write 
+	input logic RW, 			// Read/Write
+	input logic CS, 			// Chip Select
+	input logic RST,			// Chip reset
+	input logic PPUCLK,			// Input clock 21.47727 MHz for ppu functions
+	output logic NMI,			// Non interruptable Interrupted (signifies the start of VBLANK)
+	output logic ALE, 			// Address latch enable
+	output logic [13:0] APPU, 	// Address and data pins 
+	output logic [7:0] PPUDO, 	// PPU data output
+	input logic [7:0] PPUDI, 	// PPU data input 
+	input logic [3:0] EXTI, 	// EXT input (Probably gonna be unused)
+	output logic [3:0] EXTO 	// EXT output (Probably gonna be unused)
 );
+
+logic startup =0; // determines if the ppu is in it's initial startup state 
+logic 
 
 // PPU line by line rendering fsm state machine
 // Because the ppu has a very well defined timing diagram, the operation of 
@@ -69,8 +68,10 @@ logic vblank;	// Blanking time at end of each frame
 logic hblank; // blanking time at end of each scanline 
 // Step Forward Scanline cycle
 assign hblank = (n_cyc == 341); 
+
 always_ff@(posedge PPUCLK) begin
-		n_cyc = (n_cyc <= CYC ? n_cyc  + 1 : 0;
+		n_cyc = (n_cyc <= CYC) ? n_cyc  + 1 : 0;
+		if()
 end	
 
 always_ff@(posedge)
