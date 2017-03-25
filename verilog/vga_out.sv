@@ -3,7 +3,6 @@
 
 
 module vga_out(
-	input logic [7:0] DI, // Frame buffer Read data 
 	input logic pix_clk,	// 12.5 MHz clock signal
 
 	input logic [8:0] rgb_buf,	// connect to rgb output of buffer

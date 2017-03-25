@@ -62,7 +62,7 @@ module vga_fb(
 		end
 	end 
 
-	// vag out access (Read only)
+	// vga out access (Read only)
 	assign rgb = {r[2:0],g[2:0],b[2:0]};
 
 endmodule
