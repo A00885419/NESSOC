@@ -13,6 +13,7 @@ module vga_rom_test_top();
 	logic [7:0]ppu_ptr_x;
 	logic [7:0]ppu_ptr_y;
 	logic [8:0]rgb;
+	logic [8:0]rgb_OUT;
 	// Test variables 
 	integer i;
 	integer progState;
@@ -26,7 +27,9 @@ module vga_rom_test_top();
 
 	// VGA output initialization 
 	vga_out vgao_dut(
-		.pix_clk(pix_clk), .rgb_buf(rgb)
+		.pix_clk(pix_clk), .rgb_buf(rgb), 
+		.pix_ptr_x(fb_ptr_x),.pix_ptr_y(fb_ptr_y),
+		
 		);
 	
 	// frame buffer initialization
