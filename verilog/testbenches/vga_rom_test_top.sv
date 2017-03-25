@@ -16,7 +16,7 @@ module vga_rom_test_top();
 	
 	// PIN outputs
 	logic vsync;
-	logic hsync;
+	logic hsync;	
 	logic [8:0]rgb_OUT;
 	// Test variables 
 	integer i;
