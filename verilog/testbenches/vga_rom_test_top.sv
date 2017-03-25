@@ -1,8 +1,10 @@
 // VGA ROM top level test.
 
 //
+
 // (PPU REPLACED BY TEST_IMG_DUMMY_ROM) -> 
 module vga_rom_test_top(input logic CLOCK_50, rst);
+
 	logic pix_clk;
 	logic ppu_clk;
 	logic [5:0]TEST_IMG_DUMMY_ROM[255:0][239:0];
@@ -16,24 +18,38 @@ module vga_rom_test_top(input logic CLOCK_50, rst);
 	
 	// PIN outputs
 	logic vsync;
-	logic hsync;
+	logic hsync;	
 	logic [8:0]rgb_OUT;
+	
+	assign RED = rgb_OUT[8:6];
+	assign GREEN = rgb_OUT[5:3];
+	assign BLUE = rgb_OUT[2:0];
+	assign VSYNC = vsync;
+	
 	// Test variables 
-	integer i;
+	integer i, j, k;
 	integer progState;
 	
 	always_ff@(posedge ppu_clk) begin //
-		if(rst) begin 
-			progState = 0;
+		if(progState == 0) begin // state 0 = reset
 			i = 0;
-		end else ;
+			progState = 1;
+		end else begin
+			if(i < (240*256 + 1)) begin
+				if(ppu_ptr_x == 255) 
+					ppu_ptr_y = ppu_ptr_y +1;
+				ppu_ptr_x = ppu_ptr_x+1;	
+				i = i + 1;
+			end
+		end 
 	end 
 
 	// VGA output initialization 
 	vga_out vgao_dut(
 		.pix_clk(pix_clk), .rgb_buf(rgb), 
 		.pix_ptr_x(fb_ptr_x),.pix_ptr_y(fb_ptr_y),
-		.rgb(rgb_OUT),
+		.rgb(rgb_OUT),.vsync(vsync), .hsync(hsync)
+
 		);
 	
 	// frame buffer initialization
@@ -44,14 +60,23 @@ module vga_rom_test_top(input logic CLOCK_50, rst);
 		.pix_ptr_x(fb_ptr_x), .pix_ptr_y(fb_ptr_y),
 		.rgb(rgb)		
 		);
+		
 	initial begin
+
 		//for 
+
+		progState = 0;
+		for (j = 0; j <256; j++) begin 
+			$readmemh("pixtest.c_code", TEST_IMG_DUMMY_ROM[j]);
+		end 		
+
 	end 
 	// initialize clocks
 	pll_pix pll_pix0 ( .inclk0(CLOCK_50), .c0(pix_clk) ) ;	// 12.5
    pll_ppu pll_ppu0 ( .inclk0(CLOCK_50), .c0(ppu_clk) ) ;	// 25
 	
 	
+
 endmodule
 
 // megafunction wizard: %ALTPLL%
@@ -140,6 +165,7 @@ module pll_pix ( inclk0, c0);
                 altpll_component.port_extclk2 = "PORT_UNUSED",
                 altpll_component.port_extclk3 = "PORT_UNUSED",
                 altpll_component.width_clock = 5;
+
 
 
 endmodule
