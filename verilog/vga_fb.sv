@@ -1,13 +1,10 @@
-// Vga_fb.sv - Tested Working , testbench and results can be found in /testbench
+// Vga_fb.sv
 
-// This is the frame buffer for vga, The frame buffer in this case is basically ram within the ppu 
-// It will be instantiated alongside not within the vga
+// This is the frame buffer for vga, The frame buffer in this case is basically
+// ram within the ppu It will be instantiated alongside not within the vga
 
 /*
 	Frame buffer relationships:
-	
-	
-
  +--------------+   c_codes   +----------+
  |              |   (eg. 18   |          |
  |              | +---------> |  vga     |
@@ -44,7 +41,7 @@ module vga_fb(
 	input logic pix_clk,
 	input logic [7:0]pix_ptr_x,
 	input logic [7:0]pix_ptr_y,
-	output logic [8:0]rgb // output will be in the format of RRRGGGBBB r is always gonna be msb
+	output logic [8:0]rgb // format of RRRGGGBBB r is always gonna be msb
 );
 	logic [5:0]pixel_code[255:0][239:0];	// Frame buffer RAM
 	logic [5:0]pix;
@@ -53,15 +50,17 @@ module vga_fb(
 	logic [2:0]b;
 	logic [8:0]coloursDecode[63:0];
 	logic [8:0]dec;
+	
 	initial begin
 		$readmemh("vga_colours_rgb.txt",coloursDecode);
 	end 
+	
 	always_ff@(posedge pix_clk) begin
 	 pix = pixel_code[pix_ptr_x][pix_ptr_y];
 	end
-	//decode_channels c_decode ( .c_code(pix), .R(r), .G(g), .B(b) );
+	
+	
 	// PPU access (Write only)
-
 	always_ff@(posedge ppu_ctl_clk) begin 
 		if(CS) begin
 			pixel_code[ppu_ptr_x][ppu_ptr_y] = ppu_DI;

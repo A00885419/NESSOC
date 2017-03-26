@@ -12,7 +12,7 @@ module vga_fb_tb();
 	logic [7:0]pix_ptr_y;
 	//output
 	logic [8:0]rgb;
-	vga_fb dut(.*);
+	vga_fb dut(.pix_clk(ppu_ctl_clk),.*);
 	
 	integer i,j,k,l;
 	initial begin

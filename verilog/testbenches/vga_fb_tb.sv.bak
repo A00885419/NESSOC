@@ -12,7 +12,7 @@ module vga_fb_tb();
 	logic [7:0]pix_ptr_y;
 	//output
 	logic [8:0]rgb;
-	vga_fb dut(.*);
+	vga_fb dut(.pix_clk(ppu_ctl_clk).*);
 	
 	integer i,j,k,l;
 	initial begin
@@ -29,7 +29,7 @@ module vga_fb_tb();
 			pix_ptr_x = j; ppu_ptr_x = j;
 			pix_ptr_y = i; ppu_ptr_y = i;
 			ppu_DI = i+j*6;
-			#20ns;
+			#40ns;
 			$display("p: %d %d code: %x rgb : %x ",pix_ptr_x, pix_ptr_y,ppu_DI,rgb);
 			end
 		end
