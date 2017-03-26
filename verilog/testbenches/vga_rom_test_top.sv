@@ -44,6 +44,19 @@ output logic HSYNC, VSYNC);
 				if(ppu_ptr_x == 255) 
 					ppu_ptr_y = ppu_ptr_y +1;
 				ppu_ptr_x = ppu_ptr_x+1;	
+				
+				if(ppu_ptr_x <128)begin
+					if(ppu_ptr_y <128)
+							testColours = 'h27;
+						else
+							testColours = 'h14;
+				end else begin
+					if(ppu_ptr_y <128)
+						testColours = 'h01;
+					else
+						testColours = 'h2b;
+				end
+							
 				i = i + 1;
 			end
 		end
@@ -60,7 +73,7 @@ output logic HSYNC, VSYNC);
 	vga_fb fb_dut(
 		.ppu_ptr_x(ppu_ptr_x),.ppu_ptr_y(ppu_ptr_y),
 		.ppu_ctl_clk(pix_clk),.CS(1), 
-		.ppu_DI(test_read_col[ppu_ptr_x]),
+		.ppu_DI(testColours),
 		.pix_ptr_x(fb_ptr_x), .pix_ptr_y(fb_ptr_y),
 		.rgb(rgb),.pix_clk(pix_clk)		
 		);
