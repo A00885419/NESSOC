@@ -1,2 +1,8 @@
 *~
 *.swp
+*.bak
+db/*
+output_files/*
+*.qpf
+*.mpf
+*.qdf
