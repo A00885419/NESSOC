@@ -32,6 +32,10 @@ module rom_tb();
 		cpu_ab = 'hC004;
 		#200ns;
 		$display( "FIRST vector :%x exp: SEI (78)", cpu_do);	
+		//===========Mirror test==================
+		cpu_ab = 'h8004;
+		#200ns;
+		$display( "vector :%x exp: SEI (78)", cpu_do);	
 		//========== END OF CPU TEST =============
 		
 		//===============PPU TEST ================

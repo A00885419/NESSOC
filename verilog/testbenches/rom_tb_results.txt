@@ -1,6 +1,7 @@
 # lower rst vector :04, exp: 04
 # upper rst vector :c0 exp: C0
 # FIRST vector :78 exp: SEI (78)
+# vector :78 exp: SEI (78)
 # pm	 fm	 v
 # 0000	 00004010	 00
 # 0001	 00004011	 00
@@ -66,7 +67,3 @@
 # 003d	 0000404d	 00
 # 003e	 0000404e	 00
 # 003f	 0000404f	 00
-# ** Note: $stop    : C:/Users/sear/Documents/NESSOC/verilog/testbenches/rom_tb.sv(46)
-#    Time: 13410 ns  Iteration: 0  Instance: /rom_tb
-# Break in Module rom_tb at C:/Users/sear/Documents/NESSOC/verilog/testbenches/rom_tb.sv line 46
-
