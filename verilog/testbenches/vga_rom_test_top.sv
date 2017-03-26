@@ -12,7 +12,6 @@ output logic HSYNC, VSYNC);
 	logic pix_clk;
 	logic ppu_clk;
 	logic [5:0]test_read_col[240];
-	logic [5:0]TEST_IMG_DUMMY_ROM[255:0][239:0];
 	
 	logic [7:0]fb_ptr_x;
 	logic [7:0]fb_ptr_y;
@@ -20,6 +19,7 @@ output logic HSYNC, VSYNC);
 	logic [7:0]ppu_ptr_x;
 	logic [7:0]ppu_ptr_y;
 	logic [8:0]rgb;
+	logic [5:0]testColours;
 	
 	// PIN outputs
 	logic vsync;
@@ -35,10 +35,9 @@ output logic HSYNC, VSYNC);
 	integer i, j, k;
 	integer progState;
 	
-	always_ff@(posedge ppu_clk) begin //
+	always_ff@(posedge pix_clk) begin //
 		if(progState < 256) begin // state 0 = reset
 			i = 0;
-			TEST_IMG_DUMMY_ROM[progState] = test_read_col;
 			progState = progState + 1;
 		end else begin
 			if(i < (240*256 + 1)) begin
@@ -47,8 +46,8 @@ output logic HSYNC, VSYNC);
 				ppu_ptr_x = ppu_ptr_x+1;	
 				i = i + 1;
 			end
-		end 
-	end 
+		end
+	end
 
 	// VGA output initialization 
 	vga_out vgao_dut(
@@ -60,10 +59,10 @@ output logic HSYNC, VSYNC);
 	// frame buffer initialization
 	vga_fb fb_dut(
 		.ppu_ptr_x(ppu_ptr_x),.ppu_ptr_y(ppu_ptr_y),
-		.ppu_ctl_clk(ppu_clk),.CS(1), 
-		.ppu_DI(TEST_IMG_DUMMY_ROM[ppu_ptr_x][ppu_ptr_y]),
+		.ppu_ctl_clk(pix_clk),.CS(1), 
+		.ppu_DI(test_read_col[ppu_ptr_x]),
 		.pix_ptr_x(fb_ptr_x), .pix_ptr_y(fb_ptr_y),
-		.rgb(rgb)		
+		.rgb(rgb),.pix_clk(pix_clk)		
 		);
 		
 	initial begin

@@ -9,7 +9,7 @@ module vga_out(
 	output logic [7:0]pix_ptr_x,
 	output logic [7:0]pix_ptr_y,
 
-	output logic [8:0] rgb,	// 3 bits each for red, green, blue
+	output logic [8:0] rgb,	// 3 bits each for red, green, blue // Does this output to Headers? --Peter
 	output logic vsync,		// vertical syncing signal, active low
 	output logic hsync) ;	// horizonal syncing signal, active low
 
@@ -20,8 +20,7 @@ module vga_out(
 	// 328-375 sync 
 	// 376-399 back porch
 
-	logic [9:0] pixel_x;
-	logic [9:0]	pixel_y;
+	logic [9:0] pixel_x, pixel_y;
 	
 	initial begin
 		// reset pixel counters
@@ -37,7 +36,7 @@ module vga_out(
 			rgb <= '0;
 		else if (pixel_x < 288)
 			// RGB gets NES info // Get the information from the framebuffer module 
-				rgb <= rgb_buf;
+			rgb <= rgb_buf;		// set pixel to the rgb value from the buffer 
 		else 
 			rgb <= '0;
 		
