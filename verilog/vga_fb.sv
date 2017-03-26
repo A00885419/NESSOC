@@ -45,11 +45,16 @@ module vga_fb(
 	input logic [7:0]pix_ptr_y,
 	output logic [8:0]rgb // output will be in the format of RRRGGGBBB r is always gonna be msb
 );
-	logic [5:0]pixel_code[255:0][239:0];
+	logic [5:0]pixel_code[255:0][239:0];	// Frame buffer RAM
 	logic [5:0]pix;
 	logic [2:0]r; 
 	logic [2:0]g; 
 	logic [2:0]b;
+	logic [8:0]coloursDecode[63:0];
+	logic [8:0]dec;
+	initial begin
+		$readmemh("vga_colours_rgb.txt",coloursDecode);
+	end 
 
 	assign pix = pixel_code[pix_ptr_x][pix_ptr_y];
 
@@ -61,14 +66,14 @@ module vga_fb(
 			pixel_code[ppu_ptr_x][ppu_ptr_y] = ppu_DI;
 		end
 	end 
-
+	assign dec = coloursDecode[c_code];
 	// vga out access (Read only)
-	assign rgb = {r[2:0],g[2:0],b[2:0]};
+	assign rgb = {dec[8:6],dec[5:3],dec[2:0]};
 
 endmodule
 
-
 //Colour Channels decode 
+/*
 module decode_channels(input logic [5:0]c_code,
 	output logic [2:0] R,
 	output logic [2:0] G,

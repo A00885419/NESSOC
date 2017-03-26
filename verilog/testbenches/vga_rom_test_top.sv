@@ -63,19 +63,12 @@ module vga_rom_test_top(input logic CLOCK_50, rst);
 		);
 		
 	initial begin
-
-		//for 
-
 		progState = 0;
 		$readmemh("pixtest.txt", test_read_col);
 	end 
 	// initialize clocks
 	pll_pix pll_pix0 ( .inclk0(CLOCK_50), .c0(pix_clk) ) ;	// 12.5
    pll_ppu pll_ppu0 ( .inclk0(CLOCK_50), .c0(ppu_clk) ) ;	// 25
-	
-<<<<<<< HEAD
-=======
-	
 
 endmodule
 
