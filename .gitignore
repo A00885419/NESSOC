@@ -6,3 +6,4 @@ output_files/*
 *.qpf
 *.mpf
 *.qdf
+*.nes
