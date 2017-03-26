@@ -59,7 +59,5 @@ module vga_rom_test_top();
 		end 		
 	end 
 	
-	
-	
 endmodule
 
