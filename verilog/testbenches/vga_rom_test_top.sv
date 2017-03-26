@@ -7,6 +7,7 @@ module vga_rom_test_top(input logic CLOCK_50, rst);
 
 	logic pix_clk;
 	logic ppu_clk;
+	logic [5:0]test_read_col[240];
 	logic [5:0]TEST_IMG_DUMMY_ROM[255:0][239:0];
 	
 	logic [7:0]fb_ptr_x;
@@ -31,9 +32,10 @@ module vga_rom_test_top(input logic CLOCK_50, rst);
 	integer progState;
 	
 	always_ff@(posedge ppu_clk) begin //
-		if(progState == 0) begin // state 0 = reset
+		if(progState < 256) begin // state 0 = reset
 			i = 0;
-			progState = 1;
+			TEST_IMG_DUMMY_ROM[progState] = test_read_col;
+			progState = progState + 1;
 		end else begin
 			if(i < (240*256 + 1)) begin
 				if(ppu_ptr_x == 255) 
@@ -49,7 +51,6 @@ module vga_rom_test_top(input logic CLOCK_50, rst);
 		.pix_clk(pix_clk), .rgb_buf(rgb), 
 		.pix_ptr_x(fb_ptr_x),.pix_ptr_y(fb_ptr_y),
 		.rgb(rgb_OUT),.vsync(vsync), .hsync(hsync)
-
 		);
 	
 	// frame buffer initialization
@@ -66,10 +67,7 @@ module vga_rom_test_top(input logic CLOCK_50, rst);
 		//for 
 
 		progState = 0;
-		for (j = 0; j <256; j++) begin 
-			$readmemh("pixtest.c_code", TEST_IMG_DUMMY_ROM[j]);
-		end 		
-
+		$readmemh("pixtest.txt", test_read_col);
 	end 
 	// initialize clocks
 	pll_pix pll_pix0 ( .inclk0(CLOCK_50), .c0(pix_clk) ) ;	// 12.5
