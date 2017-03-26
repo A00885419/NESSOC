@@ -132,7 +132,7 @@ module decode_channels(input logic [5:0]c_code,
 			6'h3B: R = 3'b101;
 			6'h3C: R = 3'b100;
 		endcase
-/*
+
 		case(c_code)	// Decode Green Channel
 			6'h0: G = 3'b011;
 			6'h1: G = 3'b001;
@@ -240,9 +240,7 @@ module decode_channels(input logic [5:0]c_code,
 			6'h39: B = 3'b100;
 			6'h3A: B = 3'b101;
 			6'h3B: B = 3'b110;
-			6'h3C: B = 3'b111; 
+			6'h3C: B = 3'b111;
 		endcase 
 	end 
-	*/
-	end
 endmodule
