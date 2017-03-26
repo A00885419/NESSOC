@@ -3,7 +3,11 @@
 //
 
 // (PPU REPLACED BY TEST_IMG_DUMMY_ROM) -> 
-module vga_rom_test_top(input logic CLOCK_50, rst);
+module vga_rom_test_top(input logic CLOCK_50, rst,
+output logic [2:0]RED,
+output logic [2:0]GREEN,
+output logic [2:0]BLUE,
+output logic HSYNC, VSYNC);
 
 	logic pix_clk;
 	logic ppu_clk;
@@ -26,7 +30,7 @@ module vga_rom_test_top(input logic CLOCK_50, rst);
 	assign GREEN = rgb_OUT[5:3];
 	assign BLUE = rgb_OUT[2:0];
 	assign VSYNC = vsync;
-	
+	assign HSYNC = hsync;
 	// Test variables 
 	integer i, j, k;
 	integer progState;
@@ -250,8 +254,6 @@ module pll_ppu ( inclk0, c0);
                 altpll_component.port_extclk3 = "PORT_UNUSED",
                 altpll_component.width_clock = 5;
 
-
->>>>>>> origin/master
 endmodule
 
 

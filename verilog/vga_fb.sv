@@ -58,7 +58,7 @@ module vga_fb(
 
 	assign pix = pixel_code[pix_ptr_x][pix_ptr_y];
 
-	decode_channels c_decode ( .c_code(pix), .R(r), .G(g), .B(b) );
+	//decode_channels c_decode ( .c_code(pix), .R(r), .G(g), .B(b) );
 	// PPU access (Write only)
 
 	always_ff@(posedge ppu_ctl_clk) begin 
@@ -66,7 +66,7 @@ module vga_fb(
 			pixel_code[ppu_ptr_x][ppu_ptr_y] = ppu_DI;
 		end
 	end 
-	assign dec = coloursDecode[c_code];
+	assign dec = coloursDecode[ppu_DI];
 	// vga out access (Read only)
 	assign rgb = {dec[8:6],dec[5:3],dec[2:0]};
 
@@ -248,6 +248,7 @@ module decode_channels(input logic [5:0]c_code,
 			6'h3C: B = 3'b111; 
 		endcase 
 	end 
-	*/
+
 	end
 endmodule
+	*/
