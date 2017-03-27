@@ -18,6 +18,16 @@
 	
 	The buffer and uart are meant to be used together
 	
+	--- How to use ---
+	
+	- instantiate uart_port()
+	simply connect your UART signal to uart-port-DI
+	
+	available data will be present in the 64kb buffer via read_ptr
+	
+	to prevent buffer from overflowing hold CLEAR signal high 
+	to read after X number of bits are available set read_ptr to X and wait for read_valid 
+	
 	-------- an example --------
 	logic cpu_read_complete;
 	logic cpu_clk;
@@ -44,12 +54,12 @@
 		.uart_DO(uart_rx_DO)
 	);
 	
-	---- Or you can just use the _port module and call it day ----
+	---- Or you can just use the uart_port module and call it day ----
 	
 */
 
 
-module uart_port( // EZmode instantiation
+module uart_port( // EZmode instantiation encapsulates a whole bunch of stuff 
 		input logic [15:0]read_ptr, // buffer read pointer 
 		input logic clk, clear,  // control signals
 		input logic uart_port_DI, // Read UART from pin  // it better be proper FTDI 
@@ -57,14 +67,15 @@ module uart_port( // EZmode instantiation
 		output logic read_valid
 	); 
 	logic uart_valid;
-	logic [7:0]uart_rx_DO
+	logic [7:0]uart_rx_DO;
 	
-	uart_buf uart_buffer(.read_ptr(read_ptr), .uart_DI(uart_rx_DO), 
+	uart_buf uart_buffer(
+		.read_ptr(read_ptr), .uart_DI(uart_rx_DO), 
 		.read_clk(clk), 
 		.uart_valid, 
 		.clear, 
-		.uart_DO(cpu_read_val), 
-		.read_valid(uart_buf_valid)
+		.uart_DO(uart_DO), 
+		.read_valid
 	);
 	uart_rx uart_reciever(
 		.uart_DI(uart_port_DI), 
@@ -84,7 +95,7 @@ module uart_buf(//  64kb UART read buffer good for testing
 	output logic read_valid
 ); 
 	logic [15:0]rx_ptr;
-	logic [7:0]rx_buf['FFFF:0];
+	logic [7:0]rx_buf['hFFFF:0];
 	// On each read_clk data is read out to the controling module 
 	always_ff@(posedge read_clk) begin 
 		uart_DO = rx_buf[read_ptr];
@@ -96,7 +107,7 @@ module uart_buf(//  64kb UART read buffer good for testing
 												// is greater than the requested data location 
 	// Data is read into the current ptr location and the pointer is incremented 
 	always_ff@(posedge uart_valid)begin
-		rx_buf[rx_ptr] = uart_DO;
+		rx_buf[rx_ptr] = uart_DI;
 		rx_ptr = rx_ptr + 1;
 	end
 endmodule
@@ -106,7 +117,7 @@ module uart_rx( // uart in and parallel 8 bit out
 	input logic uart_DI,
 	input logic clk,	// operates at will borrow a 21.477 mhz clk borrowed from the ppu_clk
 	output logic uart_valid,
-	output logic [7:0]uart_DO,
+	output logic [7:0]uart_DO
 );
 	parameter NCLKS_PER_BIT = 186; // 21 477 000/(115200) ~= 186.4 Cycles of oversampling 
 	
@@ -115,32 +126,38 @@ module uart_rx( // uart in and parallel 8 bit out
 	parameter MARK = 0;
 	
 	parameter IDLE = SPACE; // IDLE is always space 
-	parameter START = ~IDLE; // start is always the opposite of space
-	parameter STOP = ~START // stop bit is always the opposite of start 
+	parameter START = !IDLE; // start is always the opposite of space
+	parameter STOP = !START; // stop bit is always the opposite of start 
 	
 	// RX machine states 
 	parameter WAITING = 0;
-	parameter READING_DI = 2;
-	parameter STOPPING = 3;
-	
-	logic uart_last;
-	
+	parameter READING_DI = 1;
+	parameter STOPPING = 2;
+	parameter START_BIT = 3;
 	logic [2:0]bit_ptr = 0;
-	logic [7:0]state = WAITING;
-	logic [7:0]count = 0;
+	logic [1:0]state = WAITING;
+	logic [15:0]count = 0;
 	
 	// RX fsm
 	always_ff@(posedge clk) begin
-		uart_last <= uart_DI;
 		case(state)
 			WAITING: begin 
 				uart_valid <= 0;
 				if(uart_DI == START) begin 
-					state <= READING_DI; // proceed to next bit 
+					state <= START_BIT; 		// proceed to start bit 
 					count <= 0;					// Start the count
 				end 
 			end 
-			
+			START_BIT: begin 
+				if(count == NCLKS_PER_BIT * 1.5) begin 
+					count <= 0;
+					bit_ptr <= bit_ptr + 1;
+					uart_DO[bit_ptr] <= uart_DI ^ SPACE; 
+					state <= READING_DI;
+				end else begin 
+					count <= count + 1;
+				end
+			end 
 			READING_DI: begin 
 				if(count == NCLKS_PER_BIT) begin 
 					count <= 0;
@@ -154,12 +171,19 @@ module uart_rx( // uart in and parallel 8 bit out
 	
 			STOPPING: begin 
 				bit_ptr <= 0; // Should already be at zero but this will ensure
-				uart_valid <= 1;
-				state <= WAITING;
+				if(count > NCLKS_PER_BIT/2)
+					uart_valid <= 1;
+					
+				if(count == NCLKS_PER_BIT)begin
+					count <=0;
+					state <= WAITING;
+				end else begin 
+					count <= count + 1;
+				end 
 			end
-			
-	end 
-	
+		
+		endcase
+	end
 endmodule 
 	
 	
