@@ -28,6 +28,9 @@
 	
 	frame buffer is a 2dimensional array read from it with 
 	pix_ptr_x and pix_ptr_y
+	
+	Top left Corner is  0,0 
+	bottom right corner is 255,239
 */
 
 module vga_fb(
@@ -35,7 +38,9 @@ module vga_fb(
 	input logic ppu_ctl_clk,
 	input logic [7:0]ppu_ptr_x,
 	input logic [7:0]ppu_ptr_y,
-	input logic [5:0]ppu_DI,
+	// TODO The ppu may not write each byte individually
+	// Investigate this 
+	input logic [5:0]ppu_DI, 
 	input logic CS,
 	// Output to vga_out Module
 	input logic pix_clk,

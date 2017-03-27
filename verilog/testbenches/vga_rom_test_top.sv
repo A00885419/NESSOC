@@ -1,6 +1,11 @@
 // VGA ROM top level test.
 
-//
+// Tests the following:
+// VGA output operation - working but glitchy 
+// NES colour decoding - passed 
+
+// Right now we need to solve the "square problem"
+// some anomalies are observed on the right side of the screen 
 
 // (PPU REPLACED BY TEST_IMG_DUMMY_ROM) -> 
 module vga_rom_test_top(input logic CLOCK_50, rst,
@@ -32,7 +37,8 @@ output logic HSYNC, VSYNC);
 	assign VSYNC = vsync;
 	assign HSYNC = hsync;
 	// Test variables 
-	integer i, j, k;
+	integer i, j, k; 
+	logic [6:0]grid_center;// rolls over at 128
 	integer progState;
 	
 	always_ff@(posedge pix_clk) begin //
@@ -45,37 +51,44 @@ output logic HSYNC, VSYNC);
 					ppu_ptr_y = ppu_ptr_y +1;
 				ppu_ptr_x = ppu_ptr_x+1;	
 				
-				if(ppu_ptr_x <128)begin
-					if(ppu_ptr_y <128)
-							testColours = 'h27;
+				if(ppu_ptr_x <grid_center)begin
+					if(ppu_ptr_y <grid_center)
+							testColours = 'h27; // Orange
 						else
-							testColours = 'h14;
+							testColours = 'h14;// magenta 
 				end else begin
-					if(ppu_ptr_y <128)
-						testColours = 'h01;
+					if(ppu_ptr_y <grid_center)
+						testColours = 'h01;// blue 
 					else
-						testColours = 'h2b;
+						testColours = 'h2b;// green
 				end
 							
 				i = i + 1;
-			end
+			end else i = 0; // Draw again
+			// Every 1/12th of a second, move the grid_center
+			// diagonally 
+			if(k < 1000000) k = k +1;
+			else begin 
+				k = 0;
+				grid_center = grid_center + 1;
+			end 
 		end
 	end
 
 	// VGA output initialization 
 	vga_out vgao_dut(
 		.pix_clk(pix_clk), .rgb_buf(rgb), 
-		.pix_ptr_x(fb_ptr_x),.pix_ptr_y(fb_ptr_y),
-		.rgb(rgb_OUT),.vsync(vsync), .hsync(hsync)
+		.pix_ptr_x(fb_ptr_x), .pix_ptr_y(fb_ptr_y),
+		.rgb(rgb_OUT),. vsync(vsync), .hsync(hsync)
 		);
 	
 	// frame buffer initialization
 	vga_fb fb_dut(
-		.ppu_ptr_x(ppu_ptr_x),.ppu_ptr_y(ppu_ptr_y),
-		.ppu_ctl_clk(pix_clk),.CS(1), 
+		.ppu_ptr_x(ppu_ptr_x), .ppu_ptr_y(ppu_ptr_y),
+		.ppu_ctl_clk(pix_clk), .CS(1), 
 		.ppu_DI(testColours),
 		.pix_ptr_x(fb_ptr_x), .pix_ptr_y(fb_ptr_y),
-		.rgb(rgb),.pix_clk(pix_clk)		
+		.rgb(rgb), .pix_clk(pix_clk)		
 		);
 		
 	initial begin
