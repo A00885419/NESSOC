@@ -70,7 +70,8 @@ module uart_port( // instantiates the entire port
 		//===== tx control signals =======
 		input logic[15:0]send_ptr,
 		input logic tx_clear,
-		input logic [7:0]tx_DI,		
+		input logic [7:0]tx_DI,
+		output logic send_valid,
 		output logic [7:0]uart_DO,
 		// ===== Phyiscal output pins =======
 		input logic uart_port_DI,
@@ -82,7 +83,8 @@ module uart_port( // instantiates the entire port
 		.send_ptr,
 		.uart_port_DO,
 		.clear(tx_clear),
-		.tx_DI
+		.tx_DI,
+		.send_valid,
 		.clk
 	);
 	
@@ -242,6 +244,7 @@ module uart_tx(
 	// Per byte tx logic (fsm)
 	always_ff@(posedge clk )begin 
 		tx_buf[send_ptr] = tx_DI;
+		send_valid = (tx_ptr >= send_ptr); //data in buffer isnt considered valid unless the send pointer has already moved on.
 		if(clear)begin 
 			tx_ptr = 0;
 			state <= WAITING;
