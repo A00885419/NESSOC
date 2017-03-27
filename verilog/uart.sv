@@ -21,9 +21,12 @@
 	- instantiate uart_port()
 	simply connect your UART signal to uart-port-DI
 	
-	tx data can be sent by writing to the buffer then incrementing the send_ptr, (in that order )
-	streams can be prepared by by holding tx_clear high and writing to tx_buf via send_ptr then the stream can be bursted out by resetting tx_clear the data will be streamed from memory locations $0 to $(send_ptr - 1)
-	though you can just write normally and it will still work becasuse the processing clock will be much faster than the uart baud 
+	tx data can be sent by writing to the buffer then incrementing the send_ptr,
+	(in that order ) streams can be prepared by by holding tx_clear high and writing
+	to tx_buf via send_ptr then the stream can be bursted out by resetting tx_clear 
+	the data will be streamed from memory locations $0 to $(send_ptr - 1)
+	though you can just write normally and it will still work becasuse the processing 
+	clock will be much faster than the uart baud 
 	
 	available data will be present in the 64kB buffer, this is dereferenced via the read_ptr
 	
@@ -63,16 +66,16 @@
 
 module uart_port( // instantiates the entire port
 		input logic clk, 
-		// ====== RX control signals ======
+		// ====== RX signals ======
 		input logic [15:0]read_ptr, // buffer read pointer 
 		input logic rx_clear,  
 		output logic read_valid,
-		//===== tx control signals =======
+		output logic [7:0]uart_DO,
+		//===== tx signals =======
 		input logic[15:0]send_ptr,
 		input logic tx_clear,
 		input logic [7:0]tx_DI,
 		output logic send_valid,
-		output logic [7:0]uart_DO,
 		// ===== Phyiscal output pins =======
 		input logic uart_port_DI,
 		output logic uart_port_DO
@@ -214,11 +217,12 @@ module uart_tx(
 	input logic clk,clear, // Same clock as RX
 	input logic [7:0]tx_DI,
 	input logic [15:0]send_ptr,
-	output logic uart_port_DO
+	output logic uart_port_DO,
+	output logic send_valid
 );
 
 	parameter NCLKS_PER_BIT = 186; // 21 477 000/(115200) ~= 
-	186.4 Cycles of oversampling 
+	//186.4 Cycles of oversampling 
 
 	// Depending on FTDI settings this could be different 
 	parameter SPACE = 1;
@@ -264,6 +268,7 @@ module uart_tx(
 			
 			START_BIT: begin // Send the start bit 
 				uart_port_DO <= MARK;
+				tx_bit_ptr = 0;
 				if(count == NCLKS_PER_BIT)begin 
 					count <= 0;
 					state <= SENDING_DO;
@@ -283,7 +288,7 @@ module uart_tx(
 			end 
 			STOPPING: begin	// send the stop bit and end bytestream
 				uart_port_DO <= STOP;
-				bit_ptr <= 0;
+				tx_bit_ptr <= 0;
 				tx_end = 1;
 				if(count == NCLKS_PER_BIT) begin 
 					count <=0;
@@ -296,7 +301,7 @@ module uart_tx(
 	end 
 
 	// TX Buffer Logic (surprisingly simple)
-	always_ff@posedge(tx_end) begin 
+	always_ff@(posedge tx_end) begin 
 		tx_ptr <= tx_ptr + 1;
 	end 
 endmodule
