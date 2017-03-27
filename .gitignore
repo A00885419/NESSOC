@@ -8,3 +8,6 @@ output_files/*
 *.qdf
 *.nes
 NROMTool/NROMTool/NROMTool.pro.user
+nesTop.qws
+.qsys_edit/preferences.xml
+.qsys_edit/filters.xml
