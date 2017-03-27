@@ -1,8 +1,8 @@
 /*
 	uart_rx_tb.sv
-
 	
 	tests functionality of the uart_rx module 
+	Though tbh this is more of a rx/tx module
 */
 
 module uart_rx_tb();
@@ -34,7 +34,7 @@ module uart_rx_tb();
 	initial begin
 		clk = 0;
 		#8.68us;
-		/*rx_clear = 0;
+		rx_clear = 0;
 		
 		while(!read_valid)begin
 			#8.68us; // Send Start Bit
@@ -48,7 +48,7 @@ module uart_rx_tb();
 			ascii_char = ascii_char + 1;
 		end
 		#8.68us;
-		#8.68us;*/
+		#8.68us;
 		// END OF UARx test 
 		ascii_char = 'h41;//reset back to A 
 		tx_clear = 0;
@@ -61,7 +61,7 @@ module uart_rx_tb();
 		send_ptr = send_ptr + 1;
 		#860.8us
 		// END OF UATx test
-		$stop;
+			$stop;
 	end 
 	
 	always begin 
