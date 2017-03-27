@@ -13,7 +13,7 @@
 	115200 baud	
 	1 start bit
 	no parity
-	2 stop bit 
+	1 stop bit (or more, it doesnt matter on RX side, tx will output 1)
 	8 bit data 
 	
 	--- How to use ---
@@ -21,14 +21,17 @@
 	- instantiate uart_port()
 	simply connect your UART signal to uart-port-DI
 	
-	available data will be present in the 64kB buffer via
-	read_ptr
+	tx data can be sent by writing to the buffer then incrementing the send_ptr, (in that order )
+	streams can be prepared by by holding tx_clear high and writing to tx_buf via send_ptr then the stream can be bursted out by resetting tx_clear the data will be streamed from memory locations $0 to $(send_ptr - 1)
+	though you can just write normally and it will still work becasuse the processing clock will be much faster than the uart baud 
+	
+	available data will be present in the 64kB buffer, this is dereferenced via the read_ptr
 	
 	to prevent buffer from overflowing hold CLEAR signal high 
 	to read after X number of bits are available set read_ptr
 	to X and wait for read_valid 
 	
-	-------- an example --------
+	-------- an example for rx --------
 	uart_port p1(.*);
 	assumming uart_port_DI is connected to a pin recieving
 	a uart signal at the above specifications,
@@ -60,11 +63,11 @@
 
 module uart_port( // instantiates the entire port
 		input logic clk, 
-		// RX control signals 
+		// ====== RX control signals ======
 		input logic [15:0]read_ptr, // buffer read pointer 
 		input logic rx_clear,  
 		output logic read_valid,
-		//tx control signals
+		//===== tx control signals =======
 		input logic[15:0]send_ptr,
 		input logic tx_clear,
 		input logic [7:0]tx_DI,		
@@ -98,10 +101,6 @@ module uart_port( // instantiates the entire port
 		.uart_DO(uart_rx_DO)
 	);
 endmodule 
-
-
-
-
 
 module uart_buf(//  64kB UART read buffer
 	input logic [15:0]read_ptr,
@@ -293,8 +292,7 @@ module uart_tx(
 		endcase
 	end 
 
-	// TX Buffer Logic 
-
+	// TX Buffer Logic (surprisingly simple)
 	always_ff@posedge(tx_end) begin 
 		tx_ptr <= tx_ptr + 1;
 	end 
