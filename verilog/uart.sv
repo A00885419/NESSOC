@@ -10,70 +10,84 @@
 	synch_out
 	
 	settings for com port
-	19200 baud	
+	115200 baud	
 	1 start bit
 	no parity
 	2 stop bit 
 	8 bit data 
-	
-	The buffer and uart are meant to be used together
 	
 	--- How to use ---
 	
 	- instantiate uart_port()
 	simply connect your UART signal to uart-port-DI
 	
-	available data will be present in the 64kb buffer via read_ptr
+	available data will be present in the 64kB buffer via
+	read_ptr
 	
 	to prevent buffer from overflowing hold CLEAR signal high 
-	to read after X number of bits are available set read_ptr to X and wait for read_valid 
+	to read after X number of bits are available set read_ptr
+	to X and wait for read_valid 
 	
 	-------- an example --------
-	logic cpu_read_complete;
-	logic cpu_clk;
-	logic cpu_read_ptr[15:0];
-	logic uart_buf_valid;
-	logic [7:0]cpu_read_val;
+	uart_port p1(.*);
+	assumming uart_port_DI is connected to a pin recieving
+	a uart signal at the above specifications,
 	
-	// UART module and buffer wires
-	logic uart_valid;
-	logic uart_port_DI;
-	logic [7:0]uart_rx_DO
+	data is instantly available at $0 of the buffer after the 
+	first 8 bit are passed in, subsequent bits are stored in
+	an increasing manner in the buffer. (EG passing in the 
+	stream "ABCDE") will store the following in memory
 	
-	uart_buf uart_buffer(.read_ptr(cpu_read_ptr), .uart_DI(.uart_rx_DO), 
-		.read_clk(cpu_clk), 
-		.uart_valid(uart_valid), 
-		.clear(cpu_read_complete), 
-		.uart_DO(cpu_read_val), 
-		.read_valid(uart_buf_valid)
-	);
-	uart_rx uart_reciever(
-		.uart_DI(uart_port_DI), 
-		.clk(cpu_clk), 
-		.uart_valid(uart_valid), 
-		.uart_DO(uart_rx_DO)
-	);
+	$0 = A
+	$1 = B
+	etc ...
 	
-	---- Or you can just use the uart_port module and call it day ----
+	the valid flag can be used to check if the memory location
+	you are reading from has been written to by the pointer yet
+	during this current frame. This can be useful to see if 
+	a certain size of data has been recieved yet. EG if you 
+	wanted to wait until exactly 256 bytes of data has been 
+	recieved, you would set read_ptr to 255 then watch the 
+	read_valid line until it goes high, at which point you 
+	can parse the buffer from 0-255.
+	
+	by setting clear, the dataframe can be reset,
+	the rx_ptr will go back to zero and new information will 
+	overwrite the previous information
 	
 */
 
 
-module uart_port( // EZmode instantiation encapsulates a whole bunch of stuff 
+module uart_port( // instantiates the entire port
+		input logic clk, 
+		// RX control signals 
 		input logic [15:0]read_ptr, // buffer read pointer 
-		input logic clk, clear,  // control signals
-		input logic uart_port_DI, // Read UART from pin  // it better be proper FTDI 
+		input logic rx_clear,  
+		output logic read_valid,
+		//tx control signals
+		input logic[15:0]send_ptr,
+		input logic tx_clear,
+		input logic [7:0]tx_DI,		
 		output logic [7:0]uart_DO,
-		output logic read_valid
+		// ===== Phyiscal output pins =======
+		input logic uart_port_DI,
+		output logic uart_port_DO
 	); 
 	logic uart_valid;
 	logic [7:0]uart_rx_DO;
+	uart_tx uart_transmitter(
+		.send_ptr,
+		.uart_port_DO,
+		.clear(tx_clear),
+		.tx_DI
+		.clk
+	);
 	
 	uart_buf uart_buffer(
-		.read_ptr(read_ptr), .uart_DI(uart_rx_DO), 
+		.read_ptr, .uart_DI(uart_rx_DO), 
 		.read_clk(clk), 
 		.uart_valid, 
-		.clear, 
+		.clear(rx_clear), 
 		.uart_DO(uart_DO), 
 		.read_valid
 	);
@@ -86,7 +100,10 @@ module uart_port( // EZmode instantiation encapsulates a whole bunch of stuff
 endmodule 
 
 
-module uart_buf(//  64kb UART read buffer good for testing
+
+
+
+module uart_buf(//  64kB UART read buffer
 	input logic [15:0]read_ptr,
 	input logic [7:0]uart_DI,
 	input logic uart_valid, read_clk, 
@@ -94,21 +111,27 @@ module uart_buf(//  64kb UART read buffer good for testing
 	output logic[7:0]uart_DO,
 	output logic read_valid
 ); 
+	logic buf_full;
 	logic [15:0]rx_ptr;
 	logic [7:0]rx_buf['hFFFF:0];
 	// On each read_clk data is read out to the controling module 
 	always_ff@(posedge read_clk) begin 
 		uart_DO = rx_buf[read_ptr];
 		if(clear) begin 
+			buf_full = 0;
 			rx_ptr = 0;
 		end 
 	end
-	assign read_valid = (rx_ptr >= read_ptr );   // data is valid so long as the rx_ptr 
-												// is greater than the requested data location 
+	assign read_valid = (rx_ptr > read_ptr )||buf_full;   
+	// data is valid so long as the rx_ptr also if the buffer is full then all data locations are valid.
+	// is greater than the requested data location 
 	// Data is read into the current ptr location and the pointer is incremented 
 	always_ff@(posedge uart_valid)begin
-		rx_buf[rx_ptr] = uart_DI;
-		rx_ptr = rx_ptr + 1;
+		if(!buf_full) begin
+			rx_buf[rx_ptr] = uart_DI;
+			if(rx_ptr == 'hFFFF) buf_full = 1;
+			rx_ptr = rx_ptr + 1;
+		end
 	end
 endmodule
 
@@ -186,4 +209,93 @@ module uart_rx( // uart in and parallel 8 bit out
 	end
 endmodule 
 	
-	
+module uart_tx(
+	input logic clk,clear, // Same clock as RX
+	input logic [7:0]tx_DI,
+	input logic [15:0]send_ptr,
+	output logic uart_port_DO
+);
+
+	parameter NCLKS_PER_BIT = 186; // 21 477 000/(115200) ~= 
+	186.4 Cycles of oversampling 
+
+	// Depending on FTDI settings this could be different 
+	parameter SPACE = 1;
+	parameter MARK = 0;
+
+	parameter IDLE = SPACE; // IDLE is always space 
+	parameter START = !IDLE; // start is always the opposite of 
+	//space
+	parameter STOP = !START; // stop bit is always the opposite of start
+
+	parameter WAITING = 0;
+	parameter SENDING_DO = 1;
+	parameter STOPPING = 2;
+	parameter START_BIT = 3;
+
+	logic [7:0]tx_buf['hFFFF:0];	// 64k Output buffer
+	logic [15:0]tx_ptr;				// data control pointer
+	logic [2:0]tx_bit_ptr;			// pointer for bitwise send
+	logic [15:0]count;				// Timing Counter for 
+	logic [1:0]state;				// state for the FSM
+	logic tx_end; 				// TX valid 
+
+	// Per byte tx logic (fsm)
+	always_ff@(posedge clk )begin 
+		tx_buf[send_ptr] = tx_DI;
+		if(clear)begin 
+			tx_ptr = 0;
+			state <= WAITING;
+		end 
+		case(state)
+			WAITING: begin
+				uart_port_DO <= SPACE;
+				tx_end <=0;
+				// The user will increment 
+				// send_ptr as soon as there
+				// is data
+				if(send_ptr > tx_ptr) begin 
+					count <= 0;
+					state <= START_BIT;
+				end 
+			end 
+			
+			START_BIT: begin // Send the start bit 
+				uart_port_DO <= MARK;
+				if(count == NCLKS_PER_BIT)begin 
+					count <= 0;
+					state <= SENDING_DO;
+				end else begin 
+					count <= count+1;
+				end 
+			end 
+			SENDING_DO: begin
+				uart_port_DO <= SPACE^tx_buf[tx_ptr][tx_bit_ptr];
+				if(count == NCLKS_PER_BIT) begin 
+					count <= 0;
+					tx_bit_ptr <= tx_bit_ptr + 1;
+					if(tx_bit_ptr ==7) state <= STOPPING;
+				end else begin 
+					count <= count + 1;
+				end 
+			end 
+			STOPPING: begin	// send the stop bit and end bytestream
+				uart_port_DO <= STOP;
+				bit_ptr <= 0;
+				tx_end = 1;
+				if(count == NCLKS_PER_BIT) begin 
+					count <=0;
+					state <= WAITING;
+				end else begin 
+					count <= count + 1;
+				end 
+			end 
+		endcase
+	end 
+
+	// TX Buffer Logic 
+
+	always_ff@posedge(tx_end) begin 
+		tx_ptr <= tx_ptr + 1;
+	end 
+endmodule
