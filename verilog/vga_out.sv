@@ -2,6 +2,8 @@
 // by using a 12.5MHz pixel clock, and incorporating black borders on either side
 
 
+
+
 module vga_out(
 	input logic pix_clk,	// 12.5 MHz clock signal
 
@@ -20,6 +22,15 @@ module vga_out(
 	// 328-375 sync 
 	// 376-399 back porch
 
+	// frame constants
+	parameter L_BLANK = 32;
+	parameter NES_WIDTH = 256;
+	parameter NES_HEIGHT = 240;
+	parameter HSYNC_START = 327;
+	parameter HSYNC_STOP = 376;
+	parameter VSYNC_START = 489;
+	parameter VSYNC_STOP = 492;
+
 	logic [9:0] pixel_x;
 	logic [9:0]	pixel_y;
 	
@@ -33,22 +44,22 @@ module vga_out(
 	always @(posedge pix_clk) begin
 
 		// RGB control
-		if (pixel_x < 32)
+		if (pixel_x < L_BLANK)
 			rgb <= '0;
-		else if (pixel_x < 288)
+		else if (pixel_x < L_BLANK + NES_WIDTH)
 			// RGB gets NES info // Get the information from the framebuffer module 
 				rgb <= rgb_buf;
 		else 
 			rgb <= '0;
 		
 		// HSYNC Control
-		if (pixel_x > 327 && pixel_x < 376)
+		if (pixel_x > HSYNC_START && pixel_x < HSYNC_STOP)
 			hsync <= 0;
 		else
 			hsync <= 1;
 		
 		// VSYNC Control
-		if (pixel_y > 489 && pixel_y < 492)
+		if (pixel_y > VSYNC_START && pixel_y < VSYNC_STOP)
 			vsync <= 0;
 		else
 			vsync <= 1;
@@ -69,13 +80,13 @@ module vga_out(
 	end 
 
 	always_comb begin
-		if (pixel_x < 32 && pixel_x > 287)	// before or after visible area
+		if (pixel_x < L_BLANK && pixel_x > L_BLANK + NES_WIDTH)	// before or after visible area
 			pix_ptr_x = '0;
 		else
-			pix_ptr_x = pixel_x - 32;		// set pointer for next pixel to be rendered
+			pix_ptr_x = pixel_x - L_BLANK;		// set pointer for next pixel to be rendered
 		
-		// y visible from 0-479
-		if (pixel_y < 480)
+		// lines are doubled to fill the screen
+		if (pixel_y < 2 * NES_HEIGHT)
 			pix_ptr_y = pixel_y >> 1;	// right-shift will duplicate lines
 		else
 			pix_ptr_y = '0;
