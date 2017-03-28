@@ -44,7 +44,7 @@ module rom_master(
 logic [15:0]ppu_ptr;
 logic [15:0]cpu_ptr;
 
-logic [7:0]rom['h8000:0]; // size of INES file, NROM style files with 16k Rom and 
+logic [7:0]rom['hFFFF:0]; // size of INES file, NROM style files with 16k Rom and 
 						  // 8k CHR Rom is supported only, total romdump size is 24k
 initial begin 
 	// Gotta automate this somehow later. but for now , CHAAARGEE!

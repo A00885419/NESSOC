@@ -38,10 +38,28 @@ output logic HSYNC, VSYNC);
 	assign HSYNC = hsync;
 	// Test variables 
 	integer i, j, k; 
-	logic [6:0]grid_center;// rolls over at 128
+	logic [7:0]grid_center;// rolls over at 128
+	logic [7:0]h_line = 120;// rolls over at 128
+	logic [7:0]y_line = 0;// rolls over at 128
+	logic [7:0]h_line_values[3:0];
+	logic [7:0]y_line_values[3:0];
+	integer n_line = 0;
 	integer progState;
 	
-	always_ff@(posedge pix_clk) begin //
+	assign h_line = grid_center;
+	assign y_line = grid_center;
+	initial begin
+		h_line_values[0] = 0;
+		h_line_values[1] = 255 - 10;
+		h_line_values[2] = 255 - 10;
+		h_line_values[3] = 0;
+		
+		y_line_values[0] = 0;
+		y_line_values[1] = 000;
+		y_line_values[2] = 239 - 10;
+		y_line_values[3] = 239 - 10;
+	end 
+	always_ff@(posedge ppu_clk) begin //
 		if(progState < 256) begin // state 0 = reset
 			i = 0;
 			progState = progState + 1;
@@ -51,13 +69,13 @@ output logic HSYNC, VSYNC);
 					ppu_ptr_y = ppu_ptr_y +1;
 				ppu_ptr_x = ppu_ptr_x+1;	
 				
-				if(ppu_ptr_x <grid_center)begin
-					if(ppu_ptr_y <grid_center)
+				if(ppu_ptr_x <y_line)begin
+					if(ppu_ptr_y <h_line)
 							testColours = 'h27; // Orange
 						else
 							testColours = 'h14;// magenta 
 				end else begin
-					if(ppu_ptr_y <grid_center)
+					if(ppu_ptr_y <h_line)
 						testColours = 'h01;// blue 
 					else
 						testColours = 'h2b;// green
@@ -67,10 +85,10 @@ output logic HSYNC, VSYNC);
 			end else i = 0; // Draw again
 			// Every 1/12th of a second, move the grid_center
 			// diagonally 
-			if(k < 1000000) k = k +1;
+			if(k < 1200000) k = k +1;
 			else begin 
 				k = 0;
-				grid_center = grid_center + 1;
+				grid_center = grid_center+1;
 			end 
 		end
 	end
@@ -85,7 +103,7 @@ output logic HSYNC, VSYNC);
 	// frame buffer initialization
 	vga_fb fb_dut(
 		.ppu_ptr_x(ppu_ptr_x), .ppu_ptr_y(ppu_ptr_y),
-		.ppu_ctl_clk(pix_clk), .CS(1), 
+		.ppu_ctl_clk(ppu_clk), .CS(1), 
 		.ppu_DI(testColours),
 		.pix_ptr_x(fb_ptr_x), .pix_ptr_y(fb_ptr_y),
 		.rgb(rgb), .pix_clk(pix_clk)		

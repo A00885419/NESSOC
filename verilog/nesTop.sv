@@ -1,24 +1,24 @@
-/*
-	Top Level NES module.
-	
-	By Peter Li and Cameron Morgan,
+// nesTop.sv
 
+// This is greater than the sum of its parts...
+
+/*
+	Top level NESOC Project file
 */
 
-//`define DEBUGGING 1 //  Enable debugging mode for use with test benches
 
+module nesTop(
+// uart module I/O
+	input logic uart_port_DI,
+	output logic uart_port_DO,
+	input logic CLOCK_50, rst,
+	output logic [2:0]RED,
+	output logic [2:0]GREEN,
+	output logic [2:0]BLUE,
+	output logic HSYNC, VSYNC
+);
 
-module NESOC();
-	// CPU Controls
-	logic [15:0] AB; // CPU -> * see cpummc for memory structure
-	logic clk;	 // CPU <- *
-	logic reset;	 // CPU <- *
- 	logic [7:0] DI;  // CPU <- *
-	logic [7:0] DO;  // CPU -> *
-	logic WE;	 // Write Enable
-	logic IRQ;	 // CPU <- *
-	logic NMI;	 // CPU <- * 
-	logic RDY;	 // CPU <- ready signal pauses cpu when rdy=0 (not actually used by the NES system but may be useful for simulating delays )
-
+	
+// Generated with qsys later	nessoc u0(.*);
 
 endmodule
