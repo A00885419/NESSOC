@@ -17,7 +17,7 @@ module uart_rx_tb();
 	logic [15:0]send_ptr=0;
 	logic tx_clear =1;
 	logic [7:0]tx_DI=0;
-	logic send_valid;
+	logic send_done;
 	logic uart_port_DO;
 	
 	// OUTPUTS
@@ -33,10 +33,9 @@ module uart_rx_tb();
 	uart_port dut(.*);
 	initial begin
 		clk = 0;
-		#8.68us;
 		rx_clear = 0;
 		
-		while(!read_valid)begin
+		/*while(!read_valid)begin
 			#8.68us; // Send Start Bit
 			uart_port_DI = 0;
 			for(i = 0; i < 8; i++)begin 
@@ -47,8 +46,7 @@ module uart_rx_tb();
 			uart_port_DI = 1;
 			ascii_char = ascii_char + 1;
 		end
-		#8.68us;
-		#8.68us;
+		*/
 		// END OF UARx test 
 		ascii_char = 'h41;//reset back to A 
 		tx_clear = 0;
@@ -59,7 +57,9 @@ module uart_rx_tb();
 		tx_DI = ascii_char;
 		#46.2ns;
 		send_ptr = send_ptr + 1;
-		#860.8us
+		tx_clear = 1;
+		send_ptr = 1; // blast last transmission.
+		#86.8us
 		// END OF UATx test
 			$stop;
 	end 

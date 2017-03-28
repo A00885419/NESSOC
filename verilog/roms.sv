@@ -31,28 +31,22 @@ module rom_master(
 	// PPU access bus 
 	input logic ppu_clk,
 	input logic [15:0]ppu_ab,
-	output logic [7:0]ppu_do
-	//,
-	// RS232 Serial Port for programming 
-	// TODO make the interface for this later..
-	/*
-	input logic clk, din, prg_ctrl
-	*/
-	
+	output logic [7:0]ppu_do,
+	input logic [7:0]prog_di,
+	input logic prog, rst
 );
 
 logic [15:0]ppu_ptr;
 logic [15:0]cpu_ptr;
 
-logic [7:0]rom['hFFFF:0]; // size of INES file, NROM style files with 16k Rom and 
-						  // 8k CHR Rom is supported only, total romdump size is 24k
 initial begin 
-	// Gotta automate this somehow later. but for now , CHAAARGEE!
-	// nestest.nes can be found on  
-	// https://wiki.nesdev.com/w/index.php/Emulator_tests
-	$readmemh("hexdump.nes", rom); 
+	ppu_ptr = 0;
+	cpu_ptr = 0;
+	ppu_do = 0;
+	cpu_do = 0;
 end 
 
+logic [7:0]rom['hFFFF:0]; // size of INES file, NROM style files with 16k Rom and 8k CHR Rom is supported only, total romdump size is 24k
 // -------------CPU Access and decode-------------
 always_comb begin 
 	// 16kBits =  xxaa aaaa aaaa aaaa 
@@ -71,10 +65,15 @@ always_comb begin
 	if(ppu_ab < 'h8000)	// no check for lower bound due to roll-over :3
 		ppu_ptr = {ppu_ab[11:0]} + 'h0010 + 'h4000;
 	else ppu_ptr = 0;
+	ppu_ptr = prog ? ppu_ab : ppu_ptr;// arbitrate, if prog mode is on then just write data on ppu_ab
 end
 
 always_ff@(posedge ppu_clk) begin
-	ppu_do = rom[ppu_ptr];
+	if(prog) begin 
+		rom[ppu_ptr] = prog_di;
+	end else begin 
+		ppu_do = rom[ppu_ptr];
+	end
 end
 
 endmodule

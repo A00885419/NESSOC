@@ -75,7 +75,7 @@ module uart_port( // instantiates the entire port
 		input logic[15:0]send_ptr,
 		input logic tx_clear,
 		input logic [7:0]tx_DI,
-		output logic send_valid,
+		output logic send_done,
 		// ===== Phyiscal output pins =======
 		input logic uart_port_DI,
 		output logic uart_port_DO
@@ -87,7 +87,7 @@ module uart_port( // instantiates the entire port
 		.uart_port_DO,
 		.clear(tx_clear),
 		.tx_DI,
-		.send_valid,
+		.send_done,
 		.clk
 	);
 	
@@ -115,27 +115,26 @@ module uart_buf(//  64kB UART read buffer
 	output logic[7:0]uart_DO,
 	output logic read_valid
 ); 
-	logic buf_full;
-	logic [15:0]rx_ptr;
+	logic [15:0]rx_ptr = 0;
+	logic [15:0]rx_ptr_next = 0;
 	logic [7:0]rx_buf['hFFFF:0];
 	// On each read_clk data is read out to the controling module 
 	always_ff@(posedge read_clk) begin 
 		uart_DO = rx_buf[read_ptr];
 		if(clear) begin 
-			buf_full = 0;
 			rx_ptr = 0;
+		end else begin 
+			rx_ptr = rx_ptr_next;
 		end 
 	end
-	assign read_valid = (rx_ptr > read_ptr )||buf_full;   
+
+	assign read_valid = (rx_ptr > read_ptr );   
 	// data is valid so long as the rx_ptr also if the buffer is full then all data locations are valid.
 	// is greater than the requested data location 
 	// Data is read into the current ptr location and the pointer is incremented 
 	always_ff@(posedge uart_valid)begin
-		if(!buf_full) begin
-			rx_buf[rx_ptr] = uart_DI;
-			if(rx_ptr == 'hFFFF) buf_full = 1;
-			rx_ptr = rx_ptr + 1;
-		end
+		rx_buf[rx_ptr] = uart_DI;
+		rx_ptr_next = rx_ptr + 1;
 	end
 endmodule
 
@@ -176,7 +175,7 @@ module uart_rx( // uart in and parallel 8 bit out
 				end 
 			end 
 			START_BIT: begin 
-				if(count == NCLKS_PER_BIT * 1.5) begin 
+				if(count == NCLKS_PER_BIT * 276) begin 
 					count <= 0;
 					bit_ptr <= bit_ptr + 1;
 					uart_DO[bit_ptr] <= uart_DI ^ SPACE; 
@@ -218,10 +217,11 @@ module uart_tx(
 	input logic [7:0]tx_DI,
 	input logic [15:0]send_ptr,
 	output logic uart_port_DO,
-	output logic send_valid
+	output logic send_done
 );
 
 	parameter NCLKS_PER_BIT = 186; // 21 477 000/(115200) ~= 
+	parameter NCLKS_PER_BIT_1_5 = 276;
 	//186.4 Cycles of oversampling 
 
 	// Depending on FTDI settings this could be different 
@@ -239,24 +239,21 @@ module uart_tx(
 	parameter START_BIT = 3;
 
 	logic [7:0]tx_buf['hFFFF:0];	// 64k Output buffer
-	logic [15:0]tx_ptr;				// data control pointer
-	logic [2:0]tx_bit_ptr;			// pointer for bitwise send
-	logic [15:0]count;				// Timing Counter for 
-	logic [1:0]state;				// state for the FSM
-	logic tx_end; 				// TX valid 
+	logic [15:0]tx_ptr = 0;				// data control pointer
+	logic [2:0]tx_bit_ptr =0;			// pointer for bitwise send
+	logic [15:0]count = 0;				// Timing Counter for 
+	logic [1:0]state = WAITING;				// state for the FSM
 
 	// Per byte tx logic (fsm)
 	always_ff@(posedge clk )begin 
 		tx_buf[send_ptr] = tx_DI;
-		send_valid = (tx_ptr >= send_ptr); //data in buffer isnt considered valid unless the send pointer has already moved on.
+		send_done = (tx_ptr >= send_ptr); //data in buffer isnt considered valid unless the send pointer has already moved on.
 		if(clear)begin 
 			tx_ptr = 0;
-			state <= WAITING;
 		end 
 		case(state)
 			WAITING: begin
 				uart_port_DO <= SPACE;
-				tx_end <=0;
 				// The user will increment 
 				// send_ptr as soon as there
 				// is data
@@ -289,7 +286,7 @@ module uart_tx(
 			STOPPING: begin	// send the stop bit and end bytestream
 				uart_port_DO <= STOP;
 				tx_bit_ptr <= 0;
-				tx_end = 1;
+				tx_ptr <= tx_ptr + 1;
 				if(count == NCLKS_PER_BIT) begin 
 					count <=0;
 					state <= WAITING;
@@ -300,8 +297,4 @@ module uart_tx(
 		endcase
 	end 
 
-	// TX Buffer Logic (surprisingly simple)
-	always_ff@(posedge tx_end) begin 
-		tx_ptr <= tx_ptr + 1;
-	end 
 endmodule
