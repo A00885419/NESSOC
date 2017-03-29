@@ -41,11 +41,12 @@ module vga_rom_test_top(
 		// Loopback for this system may actually be harder than Expected 
 		rx_clear <= read_valid;
 	// Constant byte blast (will blast out)
-		send_ptr <= read_valid;
+		send_ptr <= 1;
+		uart_port_DO <= ~uart_port_DO;
 		tx_clear <= 1;
-		tx_DI <= uart_DO;
+		tx_DI <= 'h41;
 	end 
-	uart_port uart_0(.clk(ppu_clk),.*);
+	//uart_port uart_0(.clk(ppu_clk),.*);
 	
 	logic nios_clk;
 	logic pix_clk;
@@ -86,6 +87,7 @@ module vga_rom_test_top(
 	assign h_line = grid_center;
 	assign y_line = grid_center;
 	initial begin
+		uart_port_DO = 0;
 		h_line_values[0] = 0;
 		h_line_values[1] = 255 - 10;
 		h_line_values[2] = 255 - 10;
