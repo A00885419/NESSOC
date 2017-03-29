@@ -1,9 +1,6 @@
 // VGA driver, takes a 256x240 image and scales it to 640x480@60Hz VGA
 // by using a 12.5MHz pixel clock, and incorporating black borders on either side
 
-
-
-
 module vga_out(
 	input logic pix_clk,	// 12.5 MHz clock signal
 
@@ -13,23 +10,32 @@ module vga_out(
 
 	output logic [8:0] rgb,	// 3 bits each for red, green, blue
 	output logic vsync,		// vertical syncing signal, active low
-	output logic hsync) ;	// horizonal syncing signal, active low
-
+	output logic hsync	    // horizonal syncing signal, active low
+);
 	// 0-31 black
 	// 32-287 NES image
 	// 288-319 black
-	// 320-327 front porch
-	// 328-375 sync 
+	// 320-327 front porch 
+	// 328-375 sync (47 cycles)
 	// 376-399 back porch
 
-	// frame constants
-	parameter L_BLANK = 32;
 	parameter NES_WIDTH = 256;
 	parameter NES_HEIGHT = 240;
-	parameter HSYNC_START = 327;
-	parameter HSYNC_STOP = 376;
-	parameter VSYNC_START = 489;
-	parameter VSYNC_STOP = 492;
+	
+	// frame constants always check >= and <
+	parameter L_BLANK = 0;
+	parameter NES_W = 32;
+	parameter R_BLANK = 288;
+	parameter HF_PORCH = 320;
+	parameter HSYNC_START = 328;
+	parameter HB_PORCH = 376;
+	parameter H_END = 400;
+	
+	parameter V_VISIBLE = 0;
+	parameter VF_PORCH = 480;
+	parameter VSYNC_START = 490;
+	parameter VB_PORCH = 492;
+	parameter V_END = 525;
 
 	logic [9:0] pixel_x;
 	logic [9:0]	pixel_y;
@@ -40,26 +46,30 @@ module vga_out(
 		pixel_y = '0;
 		rgb = '0;
 	end 
-
-	always @(posedge pix_clk) begin
+	always_comb begin 
+		rgb = (pixel_x >= NES_W && pixel_x < R_BLANK && pixel_y < VF_PORCH) ? rgb_buf : 0;
+		if(pixel_x >= R_BLANK) rgb = 0;
+	end 
+	always_ff @(posedge pix_clk) begin
 
 		// RGB control
-		if (pixel_x < L_BLANK)
-			rgb <= '0;
-		else if (pixel_x < L_BLANK + NES_WIDTH)
+		//if ( pixel_x >= L_BLANK && pixel_x < NES_W)
+		//	rgb <= '0;
+		//if (pixel_x >= NES_W && pixel_x < R_BLANK && pixel_y < VF_PORCH) begin
 			// RGB gets NES info // Get the information from the framebuffer module 
-				rgb <= rgb_buf;
-		else 
-			rgb <= '0;
+		//	rgb = rgb_buf; 
+		//end 
+		//if (pixel_x >= R_BLANK)
+		//	rgb = '0;
 		
 		// HSYNC Control
-		if (pixel_x > HSYNC_START && pixel_x < HSYNC_STOP)
+		if (pixel_x >= HSYNC_START && pixel_x < HB_PORCH)
 			hsync <= 0;
 		else
 			hsync <= 1;
 		
 		// VSYNC Control
-		if (pixel_y > VSYNC_START && pixel_y < VSYNC_STOP)
+		if (pixel_y >= VSYNC_START && pixel_y < VB_PORCH)
 			vsync <= 0;
 		else
 			vsync <= 1;
@@ -80,17 +90,15 @@ module vga_out(
 	end 
 
 	always_comb begin
-		if (pixel_x < L_BLANK && pixel_x > L_BLANK + NES_WIDTH)	// before or after visible area
-			pix_ptr_x = '0;
+		if (pixel_x >= NES_W && pixel_x < R_BLANK)	// before or after visible area
+			pix_ptr_x = pixel_x - NES_W;
 		else
-			pix_ptr_x = pixel_x - L_BLANK;		// set pointer for next pixel to be rendered
+			pix_ptr_x = 0;		// set pointer for next pixel to be rendered
 		
 		// lines are doubled to fill the screen
-		if (pixel_y < 2 * NES_HEIGHT)
+		if (pixel_y < VF_PORCH)
 			pix_ptr_y = pixel_y >> 1;	// right-shift will duplicate lines
 		else
 			pix_ptr_y = '0;
-		
-	
 	end
 endmodule

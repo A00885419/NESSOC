@@ -7,4 +7,11 @@ output_files/*
 *.mpf
 *.qdf
 *.nes
+<<<<<<< HEAD
 nesTop.qws
+=======
+NROMTool/NROMTool/NROMTool.pro.user
+nesTop.qws
+.qsys_edit/preferences.xml
+.qsys_edit/filters.xml
+>>>>>>> b80ed2dba06458830b32dc0d6efc72b8d12987a9
