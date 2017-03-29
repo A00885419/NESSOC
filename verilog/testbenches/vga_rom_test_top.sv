@@ -31,7 +31,7 @@ module vga_rom_test_top(
 	logic[15:0]send_ptr;
 	logic tx_clear;
 	logic [7:0]tx_DI;
-	logic send_valid;
+	logic send_done;
 	
 	
 	// initiate loopback test 

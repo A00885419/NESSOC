@@ -22,9 +22,8 @@ module nesTop(
 parameter OFF = 0;		// nes is off can program/setup rom
 parameter LOADING = 2;  // reading NES rom into rom module 
 parameter RUNNING = 1;  // Executing
-parameter FAILED_VERIFICATION = 4;
-parameter SUCCESSFUL_VERIFICATION = 3
-
+parameter VERIFYING = 4;
+parameter VERIFICATION_END = 3;
 // ========  NES NROM_Cartridge settings ========
 parameter NROM_END = 'h600f; // Final address of NES NROM_Cartridge
 // Clocks 
@@ -33,7 +32,6 @@ logic pix_clk;		// 12.5 Mhz vga Pixel clock
 logic ppu_clk;		// 21.4 Mhz ppu clock 
 logic ppu_slow_clk; // ppu_clk dived by 5
 logic A203_clk;
-logic rst=0; // global reset
 
 // ====== RX signals ======
 logic [15:0]read_ptr; // buffer read pointer 
@@ -83,54 +81,55 @@ end
 
 // NES primary controler FSM
 
-always_ff@(posedge nios_clk) begin 
-	if(rst)
-		nes_state = OFF;
-	case(nes_state)
-		OFF: begin 
-			rx_clear <= 0;
-			tx_clear <= 0;
-			send_ptr <= 0;
-			read_ptr <= NROM_END; // Buffer read pointer 
-			if (read_valid) begin  // read valid goes high after NROM_END
-				nes_state <= VERIFYING;
-				read_ptr <= 0;
-			end 
-		end 
-		VERIFYING: begin 
-			// Verifies  the NROM Cartridge loaded and checks header 
-			if(uart_DO == valid_header[read_ptr])begin 
-				read_ptr <= read_ptr + 1;
-			end else begin  // send char "F" for failure and reset to off 
-				nes_state <= VERIFICATION_END;
-				tx_di <= 'h46; 
-				tx_ptr <= 0;
-			end 
-			if(read_ptr == 4) begin 
-				nes_state = VERIFICATION_END;
-				tx_di <= 'h53;
-				tx_ptr <= 0;
-				// Sends char "S" for success on successful verification
-			end 
-		end 
-		VERIFICATION_END: begin 
-			tx_ptr = 1;
-			if(send_done)begin 
-				case(tx_di) 
-					'h46: nes_state = OFF; // failed  
-					'h53: nes_state = LOADING // Success 
-				endcase
-		end 
-		
-		// verification success TEST case atm do nothing
-		LOADING :begin 
+	always_ff@(posedge nios_clk) begin 
+		if(rst)
 			nes_state = OFF;
-		end 
-		RUNNING: begin 
-			nes_state = OFF;
-		end 
-	endcase
-endmodule
+		case(nes_state)
+			OFF: begin 
+				rx_clear <= 0;
+				tx_clear <= 0;
+				send_ptr <= 0;
+				read_ptr <= NROM_END; // Buffer read pointer 
+				if (read_valid) begin  // read valid goes high after NROM_END
+					nes_state <= VERIFYING;
+					read_ptr <= 0;
+				end 
+			end 
+			VERIFYING: begin 
+				// Verifies  the NROM Cartridge loaded and checks header 
+				if(uart_DO == valid_header[read_ptr])begin 
+					read_ptr <= read_ptr + 1;
+				end else begin  // send char "F" for failure and reset to off 
+					nes_state <= VERIFICATION_END;
+					tx_DI <= 'h46; 
+					send_ptr <= 0;
+				end 
+				if(read_ptr == 4) begin 
+					nes_state = VERIFICATION_END;
+					tx_DI <= 'h53;
+					send_ptr <= 0;
+					// Sends char "S" for success on successful verification
+				end 
+			end 
+			VERIFICATION_END: begin 
+				send_ptr = 1;
+				if(send_done)begin 
+					case(tx_DI) 
+						'h46: nes_state = OFF; // failed  
+						'h53: nes_state = LOADING; // Success 
+					endcase
+				end
+			end 
+			
+			// verification success TEST case atm do nothing
+			LOADING :begin 
+				nes_state = OFF;
+			end 
+			RUNNING: begin 
+				nes_state = OFF;
+			end 
+		endcase
+	end
 
 	
 // Generated with qsys later nios_system u0(.*);
