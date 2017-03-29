@@ -34,18 +34,7 @@ module vga_rom_test_top(
 	logic send_done;
 	
 	
-	// initiate loopback test 
-	always_ff@(posedge ppu_slow_clk)  begin
-	// Single byte read mode 
-		read_ptr <= 0;
-		// Loopback for this system may actually be harder than Expected 
-		rx_clear <= read_valid;
-	// Constant byte blast (will blast out)
-		send_ptr <= 1;
-		uart_port_DO <= ~uart_port_DO;
-		tx_clear <= 1;
-		tx_DI <= 'h41;
-	end 
+
 	//uart_port uart_0(.clk(ppu_clk),.*);
 	
 	logic nios_clk;
@@ -74,6 +63,10 @@ module vga_rom_test_top(
 	assign BLUE = rgb_OUT[2:0];
 	assign VSYNC = vsync;
 	assign HSYNC = hsync;
+	
+	assign uart_port_DO = uart_port_do;
+	assign uart_port_di = uart_port_DI;
+	
 	// Test variables 
 	integer i, j, k; 
 	logic [7:0]grid_center;// rolls over at 128
@@ -87,7 +80,7 @@ module vga_rom_test_top(
 	assign h_line = grid_center;
 	assign y_line = grid_center;
 	initial begin
-		uart_port_DO = 0;
+		uart_port_do = 0;
 		h_line_values[0] = 0;
 		h_line_values[1] = 255 - 10;
 		h_line_values[2] = 255 - 10;
@@ -151,6 +144,19 @@ module vga_rom_test_top(
 	initial begin
 		progState = 0;
 		$readmemh("pixtest.txt", test_read_col);
+	end 
+	
+	// initiate loopback test 
+	always_ff@(posedge ppu_slow_clk)  begin
+	// Single byte read mode 
+		read_ptr <= 0;
+		// Loopback for this system may actually be harder than Expected 
+		rx_clear <= read_valid;
+	// Constant byte blast (will blast out)
+		send_ptr <= 1;
+		uart_port_do <= ~uart_port_do;
+		tx_clear <= 1;
+		tx_DI <= 'h41;
 	end 
 	// initialize clocks
 	clocks	clock_inst (
