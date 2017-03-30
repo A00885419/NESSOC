@@ -5,7 +5,7 @@ Our new fancy 5 clock pll
 
 clock	clock_inst (
 	.inclk0 ( inclk0_sig ), // 50Mhz input 
-	.c0 ( c0_sig ),			// 50Mhz Output Phase locked  
+	.c0 ( c0_sig ),			// 200Mhz Output Phase locked  
 	.c1 ( c1_sig ),			// 21.428 Mhz ppu clock 
 	.c2 ( c2_sig ),			// ppu div 4 5.35 mhz clk 
 	.c3 ( c3_sig ),			// 1.785 Mhz 6502 clock
@@ -85,7 +85,7 @@ module clocks (
 		altpll_component.bandwidth_type = "AUTO",
 		altpll_component.clk0_divide_by = 1,
 		altpll_component.clk0_duty_cycle = 50,
-		altpll_component.clk0_multiply_by = 1,
+		altpll_component.clk0_multiply_by = 2,
 		altpll_component.clk0_phase_shift = "0",
 		altpll_component.clk1_divide_by = 7,
 		altpll_component.clk1_duty_cycle = 50,

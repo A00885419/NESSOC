@@ -20,22 +20,19 @@ module vga_rom_test_top(
 	output logic [2:0]BLUE,
 	output logic HSYNC, VSYNC);
 
-	// ===== UART test logic  =====
-	// 
 	// ====== RX signals ======
-	logic [15:0]read_ptr; // buffer read pointer 
-	logic rx_clear;  
-	logic read_valid;
-	logic [7:0]uart_DO;
-	//===== tx signals =======
-	logic[15:0]send_ptr;
-	logic tx_clear;
-	logic [7:0]tx_DI;
-	logic send_done;
-	
+		logic [15:0]read_ptr; // buffer read pointer 
+		logic rx_clear;  
+		logic read_valid;
+		logic [7:0]uart_DO;
+		//===== tx signals =======
+		logic[15:0]send_ptr;
+		logic tx_clear;
+		logic [7:0]tx_DI;
+		logic send_done;
 	
 
-	//uart_port uart_0(.clk(ppu_clk),.*);
+	uart_port uart_0(.clk(ppu_clk),.*);
 	
 	logic nios_clk;
 	logic pix_clk;
@@ -63,9 +60,7 @@ module vga_rom_test_top(
 	assign BLUE = rgb_OUT[2:0];
 	assign VSYNC = vsync;
 	assign HSYNC = hsync;
-	
-	assign uart_port_DO = uart_port_do;
-	assign uart_port_di = uart_port_DI;
+
 	
 	// Test variables 
 	integer i, j, k; 
@@ -80,7 +75,6 @@ module vga_rom_test_top(
 	assign h_line = grid_center;
 	assign y_line = grid_center;
 	initial begin
-		uart_port_do = 0;
 		h_line_values[0] = 0;
 		h_line_values[1] = 255 - 10;
 		h_line_values[2] = 255 - 10;
@@ -146,18 +140,6 @@ module vga_rom_test_top(
 		$readmemh("pixtest.txt", test_read_col);
 	end 
 	
-	// initiate loopback test 
-	always_ff@(posedge ppu_slow_clk)  begin
-	// Single byte read mode 
-		read_ptr <= 0;
-		// Loopback for this system may actually be harder than Expected 
-		rx_clear <= read_valid;
-	// Constant byte blast (will blast out)
-		send_ptr <= 1;
-		uart_port_do <= ~uart_port_do;
-		tx_clear <= 1;
-		tx_DI <= 'h41;
-	end 
 	// initialize clocks
 	clocks	clock_inst (
 	.inclk0 ( CLOCK_50 ), // 50Mhz input 

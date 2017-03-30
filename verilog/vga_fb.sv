@@ -48,7 +48,7 @@ module vga_fb(
 	input logic [7:0]pix_ptr_y,
 	output logic [8:0]rgb // format of RRRGGGBBB r is always gonna be msb
 );
-	logic [5:0]pixel_code[255:0][255:0];	// Frame buffer RAM
+	logic [5:0]pixel_code[240:0][255:0];	// Frame buffer RAM
 	logic [5:0]pix;
 	logic [2:0]r; 
 	logic [2:0]g; 

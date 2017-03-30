@@ -144,9 +144,7 @@ set_location_assignment PIN_E10 -to GPIO_0[27]
 set_location_assignment PIN_C11 -to GPIO_0[28]
 set_location_assignment PIN_B11 -to GPIO_0[29]
 set_location_assignment PIN_A12 -to GPIO_0[30]
-set_location_assignment PIN_D11 -to GPIO_0[31]
 set_location_assignment PIN_D12 -to GPIO_0[32]
-set_location_assignment PIN_B12 -to GPIO_0[33]
 set_location_assignment PIN_T9 -to GPIO_1_IN[0]
 set_location_assignment PIN_F13 -to GPIO_1[0]
 set_location_assignment PIN_R9 -to GPIO_1_IN[1]
@@ -181,6 +179,8 @@ set_location_assignment PIN_M10 -to GPIO_1[28]
 set_location_assignment PIN_L13 -to GPIO_1[29]
 set_location_assignment PIN_J16 -to GPIO_1[30]
 set_location_assignment PIN_K15 -to GPIO_1[31]
+set_location_assignment PIN_J13 -to GPIO_1[32]
+set_location_assignment PIN_J14 -to GPIO_1[33]
 set_location_assignment PIN_A2 -to qspb
 set_location_assignment PIN_A8 -to qsa
 set_location_assignment PIN_B8 -to qsb
@@ -229,23 +229,22 @@ set_location_assignment PIN_E6 -to HSYNC
 set_location_assignment PIN_D8 -to VSYNC
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name SYSTEMVERILOG_FILE verilog/clocks.sv
-set_global_assignment -name SYSTEMVERILOG_FILE verilog/nesTop.sv
-set_global_assignment -name SYSTEMVERILOG_FILE verilog/testbenches/vga_rom_test_top.sv
-set_global_assignment -name SYSTEMVERILOG_FILE verilog/uart.sv
-set_global_assignment -name SYSTEMVERILOG_FILE verilog/vga_out.sv
-set_global_assignment -name SYSTEMVERILOG_FILE verilog/vga_fb.sv
-set_global_assignment -name SYSTEMVERILOG_FILE verilog/roms.sv
-set_global_assignment -name VERILOG_FILE verilog/cpu.v
-set_global_assignment -name VERILOG_FILE verilog/ALU.v
-set_global_assignment -name CDF_FILE output_files/Chain1.cdf
-set_global_assignment -name CDF_FILE output_files/Chain2.cdf
-set_global_assignment -name SOURCE_FILE db/nesTop.cmp.rdb
-set_location_assignment PIN_J14 -to uart_port_DI
-set_location_assignment PIN_J13 -to uart_port_DO
+set_location_assignment PIN_D11 -to uart_port_DI
+set_location_assignment PIN_B12 -to uart_port_DO
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to jstk_sel
+set_global_assignment -name QIP_FILE nes/synthesis/superOS.qip
+set_global_assignment -name VERILOG_FILE verilog/ALU.v
+set_global_assignment -name VERILOG_FILE verilog/cpu.v
+set_global_assignment -name SYSTEMVERILOG_FILE verilog/roms.sv
+set_global_assignment -name SYSTEMVERILOG_FILE verilog/nesTop.sv
+set_global_assignment -name SYSTEMVERILOG_FILE verilog/uart.sv
+set_global_assignment -name SYSTEMVERILOG_FILE verilog/clocks.sv
+set_global_assignment -name SYSTEMVERILOG_FILE verilog/vga_out.sv
+set_global_assignment -name SYSTEMVERILOG_FILE verilog/vga_fb.sv
+set_global_assignment -name CDF_FILE output_files/Chain1.cdf
+set_global_assignment -name CDF_FILE output_files/Chain2.cdf
+set_global_assignment -name SOURCE_FILE db/nesTop.cmp.rdb
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
-set_global_assignment -name QIP_FILE clock.qip

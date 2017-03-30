@@ -117,7 +117,7 @@ module uart_buf(//  64kB UART read buffer
 ); 
 	logic [15:0]rx_ptr = 0;
 	logic [15:0]rx_ptr_next = 0;
-	logic [7:0]rx_buf['hFFFF:0];
+	logic [7:0]rx_buf['h600f:0];
 	// On each read_clk data is read out to the controling module 
 	always_ff@(posedge read_clk) begin 
 		uart_DO = rx_buf[read_ptr];
@@ -128,7 +128,7 @@ module uart_buf(//  64kB UART read buffer
 		end 
 	end
 
-	assign read_valid = (rx_ptr > read_ptr );   
+	assign read_valid = (rx_ptr >= read_ptr );   
 	// data is valid so long as the rx_ptr also if the buffer is full then all data locations are valid.
 	// is greater than the requested data location 
 	// Data is read into the current ptr location and the pointer is incremented 
@@ -238,8 +238,8 @@ module uart_tx(
 	parameter STOPPING = 2;
 	parameter START_BIT = 3;
 
-	logic [7:0]tx_buf['hFFFF:0];	// 64k Output buffer
-	logic [15:0]tx_ptr = 0;				// data control pointer
+	logic [7:0]tx_buf[7:0];	// 8 byte Output buffer
+	logic [7:0]tx_ptr = 0;				// data control pointer
 	logic [2:0]tx_bit_ptr =0;			// pointer for bitwise send
 	logic [15:0]count = 0;				// Timing Counter for 
 	logic [1:0]state = WAITING;				// state for the FSM

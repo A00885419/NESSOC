@@ -46,7 +46,7 @@ initial begin
 	cpu_do = 0;
 end 
 
-logic [7:0]rom['hFFFF:0]; // size of INES file, NROM style files with 16k Rom and 8k CHR Rom is supported only, total romdump size is 24k
+logic [7:0]rom['h600f:0]; // size of INES file, NROM style files with 16k Rom and 8k CHR Rom is supported only, total romdump size is 24k
 // -------------CPU Access and decode-------------
 always_comb begin 
 	// 16kBits =  xxaa aaaa aaaa aaaa 

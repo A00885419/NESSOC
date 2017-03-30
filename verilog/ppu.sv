@@ -29,13 +29,13 @@ module ppu_core( 				// PPU Component
 logic startup =0; // determines if the ppu is in it's initial startup state 
 logic 
 
-// PPU line by line rendering fsm state machine
+// PPU line by line rendering fsm 
 // Because the ppu has a very well defined timing diagram, the operation of 
 // the rendering engine can be thought of as a state machine depending on the 
 // clock only
 
 // Each frame consists of 261 scanlines and 341 clock cycles per scanline
-//              21.477M Cycles / Second
+//              5.35M Cycles / Second
 //  Framerate = -------------------------- = 241.3119 Fps
 //                261*341 Cycles / Frame
 // 

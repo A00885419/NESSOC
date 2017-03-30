@@ -1,0 +1,144 @@
+Info: Starting: Create block symbol file (.bsf)
+Info: qsys-generate F:\owncloud_sear\t6\edcas\NESOC\nesTop.qsys --block-symbol-file --output-directory=F:\owncloud_sear\t6\edcas\NESOC\nesTop --family="Cyclone IV E" --part=EP4CE22F17C6
+Progress: Loading NESOC/nesTop.qsys
+Progress: Reading input file
+Progress: Adding altmemddr_0 [altmemddr2 16.1]
+Progress: Parameterizing module altmemddr_0
+Progress: Adding clock [clock_source 16.1]
+Progress: Parameterizing module clock
+Progress: Adding jtag_uart [altera_avalon_jtag_uart 16.1]
+Progress: Parameterizing module jtag_uart
+Progress: Adding memory [altera_avalon_onchip_memory2 16.1]
+Progress: Parameterizing module memory
+Progress: Adding pio [altera_avalon_pio 16.1]
+Progress: Parameterizing module pio
+Progress: Adding processor [altera_nios2_gen2 16.1]
+Progress: Parameterizing module processor
+Progress: Adding timer [altera_avalon_timer 16.1]
+Progress: Parameterizing module timer
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: nesTop.altmemddr_0: Cyclone IV E speed grade 6 does not support DDR2 SDRAM operation above 167.0MHz on the left or right I/O banks.  This design must be placed on the top or bottom I/O banks.
+Info: nesTop.altmemddr_0: The PLL will be generated with Memory clock frequency 200.0 MHz and 48 phase steps per cycle
+Info: nesTop.jtag_uart: JTAG UART IP input clock need to be at least double (2x) the operating frequency of JTAG TCK on board
+Warning: nesTop.altmemddr_0: altmemddr_0.external_connection must be exported, or connected to a matching conduit.
+Warning: nesTop.altmemddr_0: altmemddr_0.memory must be exported, or connected to a matching conduit.
+Warning: nesTop.altmemddr_0: altmemddr_0.s1 must be connected to an Avalon-MM master
+Warning: nesTop.altmemddr_0.reset_request_n: Reset loop between altmemddr_0.reset_request_n and altmemddr_0.global_reset_n
+Info: qsys-generate succeeded.
+Info: Finished: Create block symbol file (.bsf)
+Info: 
+Info: Starting: Create HDL design files for synthesis
+Info: qsys-generate F:\owncloud_sear\t6\edcas\NESOC\nesTop.qsys --synthesis=VERILOG --output-directory=F:\owncloud_sear\t6\edcas\NESOC\nesTop\synthesis --family="Cyclone IV E" --part=EP4CE22F17C6
+Progress: Loading NESOC/nesTop.qsys
+Progress: Reading input file
+Progress: Adding altmemddr_0 [altmemddr2 16.1]
+Progress: Parameterizing module altmemddr_0
+Progress: Adding clock [clock_source 16.1]
+Progress: Parameterizing module clock
+Progress: Adding jtag_uart [altera_avalon_jtag_uart 16.1]
+Progress: Parameterizing module jtag_uart
+Progress: Adding memory [altera_avalon_onchip_memory2 16.1]
+Progress: Parameterizing module memory
+Progress: Adding pio [altera_avalon_pio 16.1]
+Progress: Parameterizing module pio
+Progress: Adding processor [altera_nios2_gen2 16.1]
+Progress: Parameterizing module processor
+Progress: Adding timer [altera_avalon_timer 16.1]
+Progress: Parameterizing module timer
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: nesTop.altmemddr_0: Cyclone IV E speed grade 6 does not support DDR2 SDRAM operation above 167.0MHz on the left or right I/O banks.  This design must be placed on the top or bottom I/O banks.
+Info: nesTop.altmemddr_0: The PLL will be generated with Memory clock frequency 200.0 MHz and 48 phase steps per cycle
+Info: nesTop.jtag_uart: JTAG UART IP input clock need to be at least double (2x) the operating frequency of JTAG TCK on board
+Warning: nesTop.altmemddr_0: altmemddr_0.external_connection must be exported, or connected to a matching conduit.
+Warning: nesTop.altmemddr_0: altmemddr_0.memory must be exported, or connected to a matching conduit.
+Warning: nesTop.altmemddr_0: altmemddr_0.s1 must be connected to an Avalon-MM master
+Warning: nesTop.altmemddr_0.reset_request_n: Reset loop between altmemddr_0.reset_request_n and altmemddr_0.global_reset_n
+Info: nesTop: Generating nesTop "nesTop" for QUARTUS_SYNTH
+Info: Generating the Example Design.
+Info: Generating the Pin Planner file.
+Info: Generating the Synopsys Design Constraints file for the example top level.
+Info: Generating the Synopsys Design Constraints file.
+Info: Generating the Timing Report script.
+Info: Generating the ALTPLL Megafunction instance.
+Info: Generating the ALTMEMPHY Megafunction instance.
+Info: Before compiling your variation in Quartus Prime, you should follow these steps:
+Info: - Enable TimeQuest under Settings, Timing Analysis Settings.
+Info: - Add the nesTop_altmemddr_0_phy_ddr_timing.sdc file to your Quartus Prime project.
+Info: - Add I/O Standard assignments by running the nesTop_altmemddr_0_pin_assignments.tcl script.
+Info: - Set the Default I/O standard to match the memory interface I/O standard setting.
+Info: - Turn on Optimize multi-corner timing in the Quartus Prime Fitter Settings.
+Info: - Please make sure that address/command pins are placed on the same edge as the CK/CK# pins.
+Info: - Set the top level entity of the project to nesTop_altmemddr_0_example_top.
+Info: See the User Guide for more details.
+Info: altmemddr_0: "nesTop" instantiated altmemddr2 "altmemddr_0"
+Info: jtag_uart: Starting RTL generation for module 'nesTop_jtag_uart'
+Info: jtag_uart:   Generation command is [exec E:/altera/quartusprime/quartus/bin64/perl/bin/perl.exe -I E:/altera/quartusprime/quartus/bin64/perl/lib -I E:/altera/quartusprime/quartus/sopc_builder/bin/europa -I E:/altera/quartusprime/quartus/sopc_builder/bin/perl_lib -I E:/altera/quartusprime/quartus/sopc_builder/bin -I E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/common -I E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/altera_avalon_jtag_uart -- E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/altera_avalon_jtag_uart/generate_rtl.pl --name=nesTop_jtag_uart --dir=C:/Users/sear/AppData/Local/Temp/alt7254_6217775316774388400.dir/0002_jtag_uart_gen/ --quartus_dir=E:/altera/quartusprime/quartus --verilog --config=C:/Users/sear/AppData/Local/Temp/alt7254_6217775316774388400.dir/0002_jtag_uart_gen//nesTop_jtag_uart_component_configuration.pl  --do_build_sim=0  ]
+Info: jtag_uart: Done RTL generation for module 'nesTop_jtag_uart'
+Info: jtag_uart: "nesTop" instantiated altera_avalon_jtag_uart "jtag_uart"
+Info: memory: Starting RTL generation for module 'nesTop_memory'
+Info: memory:   Generation command is [exec E:/altera/quartusprime/quartus/bin64/perl/bin/perl.exe -I E:/altera/quartusprime/quartus/bin64/perl/lib -I E:/altera/quartusprime/quartus/sopc_builder/bin/europa -I E:/altera/quartusprime/quartus/sopc_builder/bin/perl_lib -I E:/altera/quartusprime/quartus/sopc_builder/bin -I E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/common -I E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=nesTop_memory --dir=C:/Users/sear/AppData/Local/Temp/alt7254_6217775316774388400.dir/0003_memory_gen/ --quartus_dir=E:/altera/quartusprime/quartus --verilog --config=C:/Users/sear/AppData/Local/Temp/alt7254_6217775316774388400.dir/0003_memory_gen//nesTop_memory_component_configuration.pl  --do_build_sim=0  ]
+Info: memory: Done RTL generation for module 'nesTop_memory'
+Info: memory: "nesTop" instantiated altera_avalon_onchip_memory2 "memory"
+Info: pio: Starting RTL generation for module 'nesTop_pio'
+Info: pio:   Generation command is [exec E:/altera/quartusprime/quartus/bin64/perl/bin/perl.exe -I E:/altera/quartusprime/quartus/bin64/perl/lib -I E:/altera/quartusprime/quartus/sopc_builder/bin/europa -I E:/altera/quartusprime/quartus/sopc_builder/bin/perl_lib -I E:/altera/quartusprime/quartus/sopc_builder/bin -I E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/common -I E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=nesTop_pio --dir=C:/Users/sear/AppData/Local/Temp/alt7254_6217775316774388400.dir/0004_pio_gen/ --quartus_dir=E:/altera/quartusprime/quartus --verilog --config=C:/Users/sear/AppData/Local/Temp/alt7254_6217775316774388400.dir/0004_pio_gen//nesTop_pio_component_configuration.pl  --do_build_sim=0  ]
+Info: pio: Done RTL generation for module 'nesTop_pio'
+Info: pio: "nesTop" instantiated altera_avalon_pio "pio"
+Info: processor: "nesTop" instantiated altera_nios2_gen2 "processor"
+Info: timer: Starting RTL generation for module 'nesTop_timer'
+Info: timer:   Generation command is [exec E:/Altera/QuartusPrime/quartus/bin64//perl/bin/perl.exe -I E:/Altera/QuartusPrime/quartus/bin64//perl/lib -I E:/altera/quartusprime/quartus/sopc_builder/bin/europa -I E:/altera/quartusprime/quartus/sopc_builder/bin/perl_lib -I E:/altera/quartusprime/quartus/sopc_builder/bin -I E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/common -I E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/altera_avalon_timer -- E:/altera/quartusprime/quartus/../ip/altera/sopc_builder_ip/altera_avalon_timer/generate_rtl.pl --name=nesTop_timer --dir=C:/Users/sear/AppData/Local/Temp/alt7254_6217775316774388400.dir/0005_timer_gen/ --quartus_dir=E:/altera/quartusprime/quartus --verilog --config=C:/Users/sear/AppData/Local/Temp/alt7254_6217775316774388400.dir/0005_timer_gen//nesTop_timer_component_configuration.pl  --do_build_sim=0  ]
+Info: timer: Done RTL generation for module 'nesTop_timer'
+Info: timer: "nesTop" instantiated altera_avalon_timer "timer"
+Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_002: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_003: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_004: Inserting error_adapter: error_adapter_0
+Info: mm_interconnect_0: "nesTop" instantiated altera_mm_interconnect "mm_interconnect_0"
+Info: irq_mapper: "nesTop" instantiated altera_irq_mapper "irq_mapper"
+Info: rst_controller: "nesTop" instantiated altera_reset_controller "rst_controller"
+Info: cpu: Starting RTL generation for module 'nesTop_processor_cpu'
+Info: cpu:   Generation command is [exec E:/Altera/QuartusPrime/quartus/bin64//eperlcmd.exe -I E:/Altera/QuartusPrime/quartus/bin64//perl/lib -I E:/altera/quartusprime/quartus/sopc_builder/bin/europa -I E:/altera/quartusprime/quartus/sopc_builder/bin/perl_lib -I E:/altera/quartusprime/quartus/sopc_builder/bin -I E:/altera/quartusprime/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/cpu_lib -I E:/altera/quartusprime/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/nios_lib -I E:/altera/quartusprime/quartus/../ip/altera/nios2_ip/altera_nios2_gen2 -I E:/altera/quartusprime/quartus/../ip/altera/nios2_ip/altera_nios2_gen2 -- E:/altera/quartusprime/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/generate_rtl.epl --name=nesTop_processor_cpu --dir=C:/Users/sear/AppData/Local/Temp/alt7254_6217775316774388400.dir/0008_cpu_gen/ --quartus_bindir=E:/Altera/QuartusPrime/quartus/bin64/ --verilog --config=C:/Users/sear/AppData/Local/Temp/alt7254_6217775316774388400.dir/0008_cpu_gen//nesTop_processor_cpu_processor_configuration.pl  --do_build_sim=0  ]
+Info: cpu: # 2017.03.29 14:43:32 (*) Starting Nios II generation
+Info: cpu: # 2017.03.29 14:43:32 (*)   Checking for plaintext license.
+Info: cpu: # 2017.03.29 14:43:33 (*)   Couldn't query license setup in Quartus directory E:/Altera/QuartusPrime/quartus/bin64/
+Info: cpu: # 2017.03.29 14:43:33 (*)   Defaulting to contents of LM_LICENSE_FILE environment variable
+Info: cpu: # 2017.03.29 14:43:33 (*)   LM_LICENSE_FILE environment variable is empty
+Info: cpu: # 2017.03.29 14:43:33 (*)   Plaintext license not found.
+Info: cpu: # 2017.03.29 14:43:33 (*)   No license required to generate encrypted Nios II/e.
+Info: cpu: # 2017.03.29 14:43:33 (*)   Elaborating CPU configuration settings
+Info: cpu: # 2017.03.29 14:43:33 (*)   Creating all objects for CPU
+Info: cpu: # 2017.03.29 14:43:36 (*)   Generating RTL from CPU objects
+Info: cpu: # 2017.03.29 14:43:36 (*)   Creating plain-text RTL
+Info: cpu: # 2017.03.29 14:43:37 (*) Done Nios II generation
+Info: cpu: Done RTL generation for module 'nesTop_processor_cpu'
+Info: cpu: "processor" instantiated altera_nios2_gen2_unit "cpu"
+Info: processor_data_master_translator: "mm_interconnect_0" instantiated altera_merlin_master_translator "processor_data_master_translator"
+Info: jtag_uart_avalon_jtag_slave_translator: "mm_interconnect_0" instantiated altera_merlin_slave_translator "jtag_uart_avalon_jtag_slave_translator"
+Info: processor_data_master_agent: "mm_interconnect_0" instantiated altera_merlin_master_agent "processor_data_master_agent"
+Info: jtag_uart_avalon_jtag_slave_agent: "mm_interconnect_0" instantiated altera_merlin_slave_agent "jtag_uart_avalon_jtag_slave_agent"
+Info: jtag_uart_avalon_jtag_slave_agent_rsp_fifo: "mm_interconnect_0" instantiated altera_avalon_sc_fifo "jtag_uart_avalon_jtag_slave_agent_rsp_fifo"
+Info: router: "mm_interconnect_0" instantiated altera_merlin_router "router"
+Info: router_001: "mm_interconnect_0" instantiated altera_merlin_router "router_001"
+Info: router_002: "mm_interconnect_0" instantiated altera_merlin_router "router_002"
+Info: router_003: "mm_interconnect_0" instantiated altera_merlin_router "router_003"
+Info: cmd_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info: cmd_demux_001: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux_001"
+Info: cmd_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux"
+Info: cmd_mux_001: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux_001"
+Info: Reusing file F:/owncloud_sear/t6/edcas/NESOC/nesTop/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: rsp_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux"
+Info: rsp_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux"
+Info: Reusing file F:/owncloud_sear/t6/edcas/NESOC/nesTop/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: rsp_mux_001: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux_001"
+Info: Reusing file F:/owncloud_sear/t6/edcas/NESOC/nesTop/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: avalon_st_adapter: "mm_interconnect_0" instantiated altera_avalon_st_adapter "avalon_st_adapter"
+Info: error_adapter_0: "avalon_st_adapter" instantiated error_adapter "error_adapter_0"
+Info: nesTop: Done "nesTop" with 29 modules, 97 files
+Info: qsys-generate succeeded.
+Info: Finished: Create HDL design files for synthesis

@@ -1,0 +1,21 @@
+# # File gsaved with Nlview version 6.3.8  2013-12-19 bk=1.2992 VDI=34 GEI=35
+# 
+preplace inst nesTop -pg 1 -lvl 1 -y 40 -regy -20
+preplace inst nesTop.processor.clock_bridge -pg 1
+preplace inst nesTop.jtag_uart -pg 1 -lvl 3 -y 30
+preplace inst nesTop.memory -pg 1 -lvl 3 -y 250
+preplace inst nesTop.pio -pg 1 -lvl 3 -y 340
+preplace inst nesTop.processor.reset_bridge -pg 1
+preplace inst nesTop.clock -pg 1 -lvl 1 -y 60
+preplace inst nesTop.processor -pg 1 -lvl 2 -y 150
+preplace inst nesTop.timer -pg 1 -lvl 3 -y 140
+preplace inst nesTop.processor.cpu -pg 1
+preplace netloc INTERCONNECT<net_container>nesTop</net_container>(SLAVE)processor.debug_mem_slave,(MASTER)processor.instruction_master,(SLAVE)memory.s1,(SLAVE)jtag_uart.avalon_jtag_slave,(SLAVE)pio.s1,(SLAVE)timer.s1,(MASTER)processor.data_master) 1 1 2 280 110 640
+preplace netloc EXPORT<net_container>nesTop</net_container>(SLAVE)nesTop.led,(SLAVE)pio.external_connection) 1 0 3 NJ 370 NJ 370 NJ
+preplace netloc EXPORT<net_container>nesTop</net_container>(SLAVE)clock.clk_in_reset,(SLAVE)nesTop.reset) 1 0 1 NJ
+preplace netloc FAN_OUT<net_container>nesTop</net_container>(SLAVE)timer.clk,(SLAVE)pio.clk,(SLAVE)memory.clk1,(SLAVE)jtag_uart.clk,(SLAVE)processor.clk,(MASTER)clock.clk) 1 1 2 260 70 680
+preplace netloc FAN_OUT<net_container>nesTop</net_container>(SLAVE)timer.reset,(SLAVE)jtag_uart.reset,(MASTER)clock.clk_reset,(SLAVE)processor.reset,(SLAVE)pio.reset,(SLAVE)memory.reset1) 1 1 2 240 90 660
+preplace netloc EXPORT<net_container>nesTop</net_container>(SLAVE)nesTop.clk,(SLAVE)clock.clk_in) 1 0 1 NJ
+preplace netloc FAN_OUT<net_container>nesTop</net_container>(SLAVE)timer.irq,(SLAVE)jtag_uart.irq,(MASTER)processor.irq) 1 2 1 700
+levelinfo -pg 1 0 40 890
+levelinfo -hier nesTop 50 80 410 730 880
